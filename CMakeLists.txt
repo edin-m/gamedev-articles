@@ -4,6 +4,7 @@ project(gamedev-articles)
 
 set(GIT_ROOT ${PROJECT_SOURCE_DIR})
 set(SRC_PATH ${GIT_ROOT}/src)
+set(EXT_LIB_DIR ${GIT_ROOT}/lib)
 
 set(EXECUTABLE_OUTPUT_PATH ${GIT_ROOT}/bin)
 set(LIBRARY_OUTPUT_PATH ${GIT_ROOT}/bin)
@@ -17,8 +18,15 @@ list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(USE_GLFW "Use GLFW" ON)
 option(USE_GLEW "Use GLEW" ON)
-option(USE_DEVIL "Use DevIL" ON)
-option(USE_SOIL "Use soil" ON)
+option(USE_DEVIL "Use DevIL" OFF)
+option(USE_SOIL "Use SOIL" OFF)
+option(USE_ASSIMP "Use assimp" OFF)
+
+# default to release
+if (NOT CMAKE_BUILD_TYPE)
+  message("Setting build type to release by default")
+  set(CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
+endif()
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
@@ -85,6 +93,17 @@ if (USE_SOIL)
   add_subdirectory(${GIT_ROOT}/lib/soil)
   set(EXT_LIBS ${EXT_LIBS} SOIL)
   include_directories(${GIT_ROOT}/lib/soil/src)
+endif()
+
+# assimp
+if (USE_ASSIMP)
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+  set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+  set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${EXT_LIB_DIR}/assimp)
+  if (assimp_FOUND)
+    set(EXT_LIBS ${EXT_LIBS} ${assimp_LIBRARIES})
+  endif()
 endif()
 
 message(${EXT_LIBS})
