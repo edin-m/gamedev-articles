@@ -32,5 +32,7 @@ gamedev-articles.config
 gamedev-articles.creator
 gamedev-articles.files
 gamedev-articles.includes
+*.creator.user
 
 build
+bin
