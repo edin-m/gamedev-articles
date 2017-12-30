@@ -2,7 +2,22 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
+#include "bvh/bvh.h"
+
+//#include "IL/il.h"
+
+//#include "SOIL.h"
+
 int main() {
+//  ilInit();
+//  ILuint devilID;
+
+
+//  ilGenImages(1, &devilID);
+//  ilBindImage(devilID);
+
+    bvh::Bvh bvhh();
+
     GLFWwindow *window = NULL;
     const GLubyte *renderer;
     const GLubyte *version;

@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 project(gamedev-articles)
 
-set(GIT_ROOT ${PROJECT_SOURCE_DIR}/)
+set(GIT_ROOT ${PROJECT_SOURCE_DIR})
 set(SRC_PATH ${GIT_ROOT}/src)
 
-set(CMAKE_BINARY_DIR ${GIT_ROOT}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${GIT_ROOT}/bin)
 set(LIBRARY_OUTPUT_PATH ${GIT_ROOT}/bin)
 
@@ -14,13 +13,16 @@ include_directories("${SRC_PATH}")
 set(CMAKE_CXX_STANDARD 11)
 
 # Specify the list of directories to search for cmake modules.
-set(CMAKE_MODULE_PATH
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
-)
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(USE_GLFW "Use GLFW" ON)
 option(USE_GLEW "Use GLEW" ON)
+option(USE_DEVIL "Use DevIL" ON)
+option(USE_SOIL "Use soil" ON)
 
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+# GLFW
 if (USE_GLFW)
   find_package(OpenGL REQUIRED)
   if (OPENGL_FOUND)
@@ -56,4 +58,35 @@ if (USE_GLEW)
   endif(APPLE)
 endif (USE_GLEW)
 
+# GLM
+include_directories(${GIT_ROOT}/glm)
+
+# DEVIL
+if (USE_DEVIL)
+  if (APPLE)
+    set(CMAKE_MACOSX_RPATH 1)
+  endif()
+  set(IL_TESTS OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${GIT_ROOT}/lib/DevIL/DevIL)
+  set_target_properties(IL PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set_target_properties(IL PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set_target_properties(IL PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set_target_properties(ILU PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set_target_properties(ILU PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set_target_properties(ILU PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set_target_properties(ILUT PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set_target_properties(ILUT PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set_target_properties(ILUT PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
+  set(EXT_LIBS ${EXT_LIBS} IL ILU ILUT)
+  include_directories(${GIT_ROOT}/lib/DevIL/DevIL/include)
+endif()
+
+if (USE_SOIL)
+  add_subdirectory(${GIT_ROOT}/lib/soil)
+  set(EXT_LIBS ${EXT_LIBS} SOIL)
+  include_directories(${GIT_ROOT}/lib/soil/src)
+endif()
+
+message(${EXT_LIBS})
+add_subdirectory(src)
 add_subdirectory(projects)

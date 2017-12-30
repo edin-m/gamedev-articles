@@ -10,3 +10,15 @@
 	path = lib/glfw
 	url = https://github.com/glfw/glfw.git
     branch = 999f3556fdd80983b10051746264489f2cb1ef16
+[submodule "lib/DevIL"]
+	path = lib/DevIL
+	url = https://github.com/DentonW/DevIL.git
+    branch = e34284a7e07763769f671a74b4fec718174ad862
+[submodule "lib/soil"]
+	path = lib/soil
+	url = https://github.com/kbranigan/Simple-OpenGL-Image-Library
+    branch = 4fff135429c4c7996791c019e6cc20a1e9fde568
+[submodule "lib/assimp"]
+	path = lib/assimp
+	url = https://github.com/assimp/assimp.git
+    branch = 80799bdbf90ce626475635815ee18537718a05b1
