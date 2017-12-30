@@ -1,0 +1,12 @@
+[submodule "lib/glew"]
+	path = lib/glew
+    url = https://github.com/nigels-com/glew.git
+    branch = 3a8eff77da3658c13fbd3634c943d5251d76322c
+[submodule "lib/glm"]
+	path = lib/glm
+	url = https://github.com/g-truc/glm.git
+    branch = 6fa203eeb7fbcbb6f620501fad40359c8a456049
+[submodule "lib/glfw"]
+	path = lib/glfw
+	url = https://github.com/glfw/glfw.git
+    branch = 999f3556fdd80983b10051746264489f2cb1ef16
