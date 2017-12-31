@@ -25,3 +25,6 @@
 [submodule "lib/openexr"]
 	path = lib/openexr
 	url = https://github.com/openexr/openexr.git
+[submodule "lib/loggingpp"]
+	path = lib/loggingpp
+	url = https://github.com/muflihun/easyloggingpp.git

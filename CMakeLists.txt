@@ -16,11 +16,17 @@ set(CMAKE_CXX_STANDARD 11)
 # Specify the list of directories to search for cmake modules.
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+if (APPLE)
+  set(CMAKE_MACOSX_RPATH 1)
+endif()
+
 option(USE_GLFW "Use GLFW" ON)
 option(USE_GLEW "Use GLEW" ON)
 option(USE_DEVIL "Use DevIL" OFF)
 option(USE_SOIL "Use SOIL" OFF)
 option(USE_ASSIMP "Use assimp" OFF)
+option(USE_OPENEXR "Use OpenEXR" OFF)
+option(USE_LOGGINGPP "Use loggingpp" ON)
 
 # default to release
 if (NOT CMAKE_BUILD_TYPE)
@@ -71,9 +77,6 @@ include_directories(${GIT_ROOT}/glm)
 
 # DEVIL
 if (USE_DEVIL)
-  if (APPLE)
-    set(CMAKE_MACOSX_RPATH 1)
-  endif()
   set(IL_TESTS OFF CACHE BOOL "" FORCE)
   add_subdirectory(${GIT_ROOT}/lib/DevIL/DevIL)
   set_target_properties(IL PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
@@ -104,6 +107,20 @@ if (USE_ASSIMP)
   if (assimp_FOUND)
     set(EXT_LIBS ${EXT_LIBS} ${assimp_LIBRARIES})
   endif()
+endif()
+
+## OpenEXR - unused
+#if (USE_OPENEXR)
+#  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+##  add_subdirectory(${EXT_LIB_DIR}/openexr/IlmBase)
+#  set(ILMBASE_PACKAGE_PREFIX ${GIT_ROOT}/del/openexr/IlmBase/build/install)
+#  add_subdirectory(${EXT_LIB_DIR}/openexr/OpenEXR)
+#endif()
+
+if (USE_LOGGINGPP)
+  set(build_static_lib ON CACHE BOOL "" FORCE)
+  add_subdirectory(${EXT_LIB_DIR}/loggingpp)
+  set(EXT_LIBS ${EXT_LIBS} ${easyloggingpp_LIBRARIES})
 endif()
 
 message(${EXT_LIBS})
