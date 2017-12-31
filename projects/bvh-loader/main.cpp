@@ -6,15 +6,41 @@
 
 //#include "IL/il.h"
 
-//#include "SOIL.h"
-
 int main() {
-//  ilInit();
-//  ILuint devilID;
+//  GLFWwindow* window = nullptr;
 
+//  if (!glfwInit()) {
+//    fprintf( stderr, "ERROR: could not start GLFW3\n" );
+//    return 1;
+//  }
 
-//  ilGenImages(1, &devilID);
-//  ilBindImage(devilID);
+//  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+//  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+//  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+//  window = glfwCreateWindow(640, 480, "Hello world", nullptr, nullptr);
+
+//  if (!window) {
+//    fprintf( stderr, "ERROR: could not open window with GLFW3\n" );
+//    glfwTerminate();
+//    return 1;
+//  }
+
+//  glfwMakeContextCurrent(window);
+//  glewExperimental = GL_TRUE;
+//  glewInit();
+
+//  const GLubyte *renderer;
+//  const GLubyte *version;
+
+//  renderer = glGetString(GL_RENDERER);
+//  version = glGetString(GL_VERSION);
+
+//  printf("Renderer: %s\n", renderer);
+//  printf("OpenGL version supported %s\n", version);
+
+//  return 0;
 
     bvh::Bvh bvhh();
 
