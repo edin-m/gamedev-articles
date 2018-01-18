@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(gamedev-articles)
 
+include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
+
 set(GIT_ROOT ${PROJECT_SOURCE_DIR})
 set(SRC_PATH ${GIT_ROOT}/src)
 set(EXT_LIB_DIR ${GIT_ROOT}/lib)
@@ -50,7 +52,7 @@ if (USE_GLFW)
   set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
   set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-  add_subdirectory(${GIT_ROOT}/lib/glfw)
+  add_subdirectory(${EXT_LIB_DIR}/glfw)
   set(EXT_LIBS ${EXT_LIBS} glfw)
 endif (USE_GLFW)
 
@@ -59,18 +61,22 @@ if (APPLE AND (NOT USE_GLEW))
 endif ()
 
 if (USE_GLEW)
+  if (NOT EXISTS ${GIT_ROOT}/lib_bin/glew-2.1.0.zip)
+    execute_process(
+        COMMAND wget -P ${GIT_ROOT}/lib_bin https://netcologne.dl.sourceforge.net/project/glew/glew/2.1.0/glew-2.1.0.zip
+    )
+  endif ()
+  if (NOT EXISTS ${GIT_ROOT}/lib/glew-2.1.0)
+    execute_process(
+      COMMAND unzip ${GIT_ROOT}/lib_bin/glew-2.1.0.zip -d ${GIT_ROOT}/lib
+    )
+  endif()
+
   add_definitions(-DGLEW_STATIC)
   set(GLEW_USE_STATIC_LIBS ON)
-  set(GLEW_INCLUDE_DIR "${GIT_ROOT}/lib_bin/glew-2.1.0/macos/include")
-  set(GLEW_LIBRARY "${GIT_ROOT}/lib_bin/glew-2.1.0/macos/lib")
-  if (APPLE)
-    find_package(GLEW REQUIRED)
-    if (GLEW_FOUND)
-        include_directories(${GLEW_INCLUDE_DIR})
-    endif()
-    link_directories(${GLEW_LIBRARY})
-    set(EXT_LIBS ${EXT_LIBS} GLEW)
-  endif(APPLE)
+  add_subdirectory(${EXT_LIB_DIR}/glew-2.1.0/build/cmake)
+  set(EXT_LIBS ${EXT_LIBS} glew)
+  include_directories(${EXT_LIB_DIR}/glew-2.1.0/include)
 endif (USE_GLEW)
 
 # GLM

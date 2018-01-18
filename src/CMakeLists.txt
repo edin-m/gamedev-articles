@@ -1,6 +1,9 @@
 
 set(SRCLIB_SOURCES
   bvh/bvh.cpp
+  meshdata.cpp
+  meshloader.cpp
+  meshgraphics.cpp
   shader.cpp)
 
 add_library(srclib

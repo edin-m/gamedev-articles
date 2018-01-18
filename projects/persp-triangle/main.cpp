@@ -18,14 +18,6 @@
 
 #include "shader.h"
 
-#include "bvh/bvh.h"
-
-#include "camera.h"
-
-#include "meshdata.h"
-#include "meshgraphics.h"
-#include "meshloader.h"
-
 #define BUFFER_OFFSET(offset) ((void *)(offset))
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -77,55 +69,66 @@ int main() {
 
   int width = 800;
   int height = 600;
-  k::Camera camera(width, height);
+  // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+  glm::mat4 Projection = glm::perspective(glm::radians(45.0f), (float) width / (float)height, 0.1f, 100.0f);
+  glm::mat4 View = glm::lookAt(
+      glm::vec3(1,1,3), // Camera is at (4,3,3), in World Space
+      glm::vec3(0,0,0), // and looks at the origin
+      glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+  );
   glm::mat4 Model = glm::mat4(1.0f);
-  glm::mat4 mvp = camera.matrix() * Model;
+  glm::mat4 mvp = Projection * View * Model;
 
-  k::MeshData meshData("shader3");
-  k::MeshGraphics meshGraphics;
+  GLuint vao;
+  glGenVertexArrays( 1, &vao );
+  glBindVertexArray( vao );
 
-  {
-    GLushort* cube_elements = new GLushort[3] {
-      0, 1, 2
-    };
+  GLushort cube_elements[] = {
+    0, 1, 2
+  };
 
-    GLfloat* g_vertex_buffer_data = new GLfloat[9] {
-       -1.0f, -1.0f, 0.0f,
-       1.0f, -1.0f, 0.0f,
-       0.0f,  1.0f, 0.0f,
-    };
+  GLuint ibo_cube_elements;
+  glGenBuffers(1, &ibo_cube_elements);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_cube_elements);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_elements), cube_elements, GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    k::LoadedMeshData loadedData;
-    loadedData.elements = cube_elements;
-    loadedData.lenElements = 3;
-    loadedData.lenVertexBufferData = 9;
-    loadedData.vertexBufferData = g_vertex_buffer_data;
+  // An array of 3 vectors which represents 3 vertices
+  static const GLfloat g_vertex_buffer_data[] = {
+     -1.0f, -1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f,
+     0.0f,  1.0f, 0.0f,
+  };
 
-    meshGraphics.loadMeshData(meshData, loadedData);
+  GLuint vertexbuffer;
+  glGenBuffers(1, &vertexbuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    delete[] cube_elements;
-    delete[] g_vertex_buffer_data;
-  }
-
-  k::Shader& shader = meshData.shader();
-  meshGraphics.loadVerticesToShader(meshData, "vPosition");
-
+  k::Shader shader;
+  shader.loadShader("shader3");
   shader.use();
-  GLuint MatrixID = shader.uniform("mvp");
+
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+  GLuint MatrixID = glGetUniformLocation(shader.getProgram(), "mvp");
   glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp));
-  shader.unuse();
+
+  glBindVertexArray(0);
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glBindVertexArray(vao);
     shader.use();
-    GLuint MatrixID = shader.uniform("mvp");
-    glm::mat4 mvp_ = camera.matrix() * glm::mat4(1.0f);
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp_));
-    shader.unuse();
-    meshGraphics.renderMesh(meshData);
-    camera.move(glm::vec3(-0.01f, 0.0f, 0.0f));
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_cube_elements);
+//    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+    // or
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers( window );
     glfwPollEvents();

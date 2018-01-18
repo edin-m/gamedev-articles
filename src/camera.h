@@ -2,11 +2,15 @@
 #define CAMERA_H
 
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 namespace k {
 
 class Camera
 {
+  constexpr static const float ZNEAR = 0.1f;
+  constexpr static const float ZFAR = 100.0f;
+
   glm::vec3 location;
   glm::vec3 lookat;
   glm::vec3 upvec;
@@ -14,23 +18,21 @@ class Camera
   glm::mat4 projection;
   glm::mat4 view;
 
-  float znear, zfar;
   float fovy, m_aspect;
 
   void updateMatrices() {
     view = glm::lookAt(location, lookat, upvec);
-    projection = glm::perspective(fovy, m_aspect, znear, zfar);
+    projection = glm::perspective(
+          glm::radians(fovy), m_aspect, ZNEAR, ZFAR);
   }
 
 public:
   Camera(int viewportWidth, int viewportHeight) {
-    location = glm::vec3(0, 50, 50);
+    location = glm::vec3(1, 1, 3);
     lookat   = glm::vec3(0, 0, 0);
     upvec    = glm::vec3(0, 1, 0);
-    znear = 0.01f;
-    zfar  = 10000.0f;
     fovy  = 45.0f;
-    m_aspect = viewportWidth / viewportHeight;
+    m_aspect = (float) viewportWidth / (float) viewportHeight;
 
     updateMatrices();
   }
@@ -42,6 +44,11 @@ public:
 
   float aspect() const { return m_aspect; }
   void  aspect(float ratio) { m_aspect = ratio; updateMatrices(); }
+
+  void move(glm::vec3 translate) {
+    location += translate;
+    updateMatrices();
+  }
 };
 
 }

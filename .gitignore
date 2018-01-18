@@ -36,3 +36,5 @@ gamedev-articles.includes
 
 build
 bin
+lib_bin/*.zip
+lib/glew-2.1.0

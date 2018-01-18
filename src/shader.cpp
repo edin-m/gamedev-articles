@@ -12,13 +12,11 @@ Shader::Shader()
 
 }
 
-Shader::~Shader()
-{
+Shader::~Shader() {
     deleteShader();
 }
 
-GLuint Shader::loadShader(const std::string& name)
-{
+GLuint Shader::loadShader(const std::string& name) {
     deleteShader();
     this->name = name;
 
@@ -64,35 +62,27 @@ GLuint Shader::loadShader(const std::string& name)
     return program;
 }
 
-bool Shader::deleteShader()
-{
-    if( program > 0)
-    {
+bool Shader::deleteShader() {
+    if (program > 0) {
         glDeleteProgram(program);
-
         //TOOD: check for GL_INVALID_VALUE
     }
-
     return true;
 }
 
-void Shader::use()
-{
+void Shader::use() {
     glUseProgram(program);
 }
 
-void Shader::unuse()
-{
+void Shader::unuse() {
     glUseProgram(0);
 }
 
-GLuint Shader::getProgram() const
-{
+GLuint Shader::getProgram() const {
     return program;
 }
 
-GLuint Shader::loadShader(GLuint type, const std::string& path)
-{
+GLuint Shader::loadShader(GLuint type, const std::string& path) {
     std::fstream in;
     in.open(path.c_str(), std::ios_base::in);
 
@@ -153,52 +143,44 @@ GLuint Shader::createProgram(const std::vector<GLuint>& shaders)
     return _program;
 }
 
-GLint Shader::addAttribute(const std::string& attr)
-{
+GLint Shader::addAttribute(const std::string& attr) {
     const GLchar* _attr = attr.c_str();
 
-    if( program != 0 )
-    {
-        if( attributes.count(_attr) > 0 )
+    if (program != 0) {
+        if (attributes.count(_attr) > 0) {
             return attributes[_attr];
+        }
 
         GLint attrloc = glGetAttribLocation(program, _attr);
         // TODO: check GL_INVALID_OPERATION
         attributes[_attr] = attrloc;
-
         return attrloc;
     }
-
     return -1;
 }
 
-GLint Shader::addUniform(const std::string& unifrm)
-{
-    const GLchar* _unifrm = unifrm.c_str();
+GLint Shader::addUniform(const std::string& uniform) {
+    const GLchar* _uniform = uniform.c_str();
 
-    if( program != 0 )
-    {
-        if( uniforms.count(_unifrm) > 0 )
-            return uniforms[_unifrm];
+    if (program != 0) {
+        if (uniforms.count(_uniform) > 0) {
+            return uniforms[_uniform];
+        }
 
-        GLint uniformloc = glGetUniformLocation(program, _unifrm);
+        GLint uniformloc = glGetUniformLocation(program, _uniform);
         // TODO: check GL_INVALID_OPERATION
-        uniforms[(const char*)_unifrm] = uniformloc;
-
+        uniforms[(const char*)_uniform] = uniformloc;
         return uniformloc;
     }
-
     return -1;
 }
 
-GLint Shader::attribute(const std::string& attr)
-{
+GLint Shader::attribute(const std::string& attr) {
     return addAttribute(attr);
 }
 
-GLint Shader::uniform(const std::string& unifrm)
-{
-    return addUniform(unifrm);
+GLint Shader::uniform(const std::string& uniform) {
+    return addUniform(uniform);
 }
 
 }
