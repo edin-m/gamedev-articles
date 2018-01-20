@@ -32,3 +32,6 @@
 	path = lib/glfm
 	url = https://github.com/brackeen/glfm.git
     branch = 8b6973dbc83acdcad58a168e44871de414773d9d
+[submodule "tools/glsl-validator"]
+	path = tools/glsl-validator
+	url = https://github.com/felixpalmer/glsl-validator

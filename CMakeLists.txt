@@ -23,9 +23,12 @@ if (APPLE)
   add_definitions(-DAPPLE)
 endif()
 
+
+#option(BUILD_IOS "Build iOS projects" OFF)
+
 option(USE_GLFW "Use GLFW" ON)
 option(USE_GLEW "Use GLEW" ON)
-option(USE_DEVIL "Use DevIL" OFF)
+option(USE_DEVIL "Use DevIL" ON)
 option(USE_SOIL "Use SOIL" OFF)
 option(USE_ASSIMP "Use assimp" OFF)
 option(USE_OPENEXR "Use OpenEXR" OFF)
@@ -130,6 +133,11 @@ if (USE_LOGGINGPP)
   add_subdirectory(${EXT_LIB_DIR}/loggingpp)
   set(EXT_LIBS ${EXT_LIBS} ${easyloggingpp_LIBRARIES})
 endif()
+
+## GLFM - ios/andriod glfw
+#if (BUILD_IOS OR BUILD_ANDROID)
+
+#endif()
 
 message(${EXT_LIBS})
 add_subdirectory(src)

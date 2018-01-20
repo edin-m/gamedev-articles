@@ -22,7 +22,6 @@ class MeshData {
 
 public:
   MeshData(const std::string& shaderName);
-  ~MeshData();
 
   GLMeshData& data() { return glMeshData; }
   Shader& shader() { return shader_; }

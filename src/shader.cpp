@@ -110,7 +110,7 @@ GLuint Shader::createProgram(const std::vector<GLuint>& shaders) {
   GLuint _program = glCreateProgram();
   for(std::vector<GLuint>::const_iterator it = shaders.begin(); it != shaders.end(); ++it) {
     GLuint shader = (GLuint) *it;
-    GL_CHECK((glAttachShader(_program, shader));
+    GL_CHECK(glAttachShader(_program, shader));
   }
 
   GL_CHECK(glLinkProgram(_program));

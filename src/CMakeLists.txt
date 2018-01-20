@@ -4,6 +4,8 @@ set(SRCLIB_SOURCES
   meshdata.cpp
   meshloader.cpp
   meshgraphics.cpp
+  glcheck.cpp
+  textureloader.cpp
   shader.cpp)
 
 add_library(srclib

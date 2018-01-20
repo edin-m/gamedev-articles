@@ -6,10 +6,14 @@
 namespace k {
 
 struct LoadedMeshData {
-  GLushort* elements;
+  GLuint* elements;
   GLfloat* vertexBufferData;
+  GLfloat* texelData;
   int lenVertexBufferData;
   int lenElements;
+  int lenTexelData;
+  constexpr static const int numOfVerticesPerElement = 3;
+  constexpr static const int numOfTexelsPerElement = 2;
 };
 
 class MeshLoader
