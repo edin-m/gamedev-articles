@@ -142,3 +142,5 @@ endif()
 message(${EXT_LIBS})
 add_subdirectory(src)
 add_subdirectory(projects)
+
+

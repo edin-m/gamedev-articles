@@ -1,13 +1,10 @@
-#version 130
+#version 330
 
-in vec4 position;
-in vec4 color;
+layout(location = 0) in vec4 vPosition;
+
 uniform mat4 MVP;
-
-smooth out vec4 vColor;
 
 void main()
 {
-    gl_Position = MVP * position;
-    vColor = color;
+  gl_Position = MVP * vPosition;
 }

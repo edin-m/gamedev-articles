@@ -133,6 +133,9 @@ GLint Shader::addAttribute(const std::string& attr) {
     }
 
     GLint attrloc = GL_CHECK(glGetAttribLocation(program, _attr));
+    if (attrloc == -1) {
+      std::cout << "Could not find attribute location " << attr << std::endl;
+    }
     attributes[_attr] = attrloc;
     return attrloc;
   }
@@ -148,6 +151,9 @@ GLint Shader::addUniform(const std::string& uniform) {
     }
 
     GLint uniformloc = GL_CHECK(glGetUniformLocation(program, _uniform));
+    if (uniformloc == -1) {
+      std::cout << "Could not find uniform location " << uniform << std::endl;
+    }
     uniforms[(const char*)_uniform] = uniformloc;
     return uniformloc;
   }

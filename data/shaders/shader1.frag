@@ -1,8 +1,8 @@
-#version 130
+#version 330
 
-smooth in vec4 vColor;
+out vec4 fColor;
 
 void main()
 {
-    gl_FragColor = vColor;
+  fColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }

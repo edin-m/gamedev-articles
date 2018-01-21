@@ -5,6 +5,7 @@
 #include <functional>
 
 #include <memory>
+#include <vector>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -25,6 +26,7 @@
 #include "meshdata.h"
 #include "meshgraphics.h"
 #include "meshloader.h"
+#include "textureloader.h"
 
 #include "IL/il.h"
 #include "IL/ilu.h"
@@ -34,10 +36,86 @@
 
 #define BUFFER_OFFSET(offset) ((void *)(offset))
 
+
+
+static GLuint vboVert, vboIndices;
+static GLuint vao;
+
+
+float rotationAngle = 0.0f;
+
+glm::mat4 model = glm::mat4(1.0);
+
+static short bvh_elements = 0;
+
+bool gogogo = true;
+
+k::Bvh* bvh;
+int frame = 0, frameChange = 1;
+
+void tmpProcess(k::JOINT* joint,
+                std::vector<glm::vec4>& vertices,
+                std::vector<GLshort>& indices,
+                GLshort parentIndex = 0)
+{
+    glm::vec4 translatedVertex = joint->matrix[3];
+
+    vertices.push_back(translatedVertex);
+
+    GLshort myindex = vertices.size() - 1;
+
+    if( parentIndex != myindex )
+    {
+        indices.push_back(parentIndex);
+        indices.push_back(myindex);
+    }
+
+    for(auto& child : joint->children) {
+        tmpProcess(child, vertices, indices, myindex);
+    }
+}
+
+void update() {
+
+  if (frameChange) {
+    frame = frame + frameChange;
+  } else {
+    return;
+  }
+
+  int frameto = frame % bvh->getNumFrames();
+  std::cout << "move to " << frameto << std::endl;
+  bvh->moveTo(frameto);
+
+  std::vector<glm::vec4> vertices;
+  std::vector<GLshort> bvhindices;
+
+  tmpProcess((k::JOINT*)bvh->getRootJoint(), vertices, bvhindices);
+
+
+
+//    for (int i = 0; i < vertices.size(); i++) {
+//      std::cout << vertices[i].x << " "
+//                   << vertices[i].y << " "
+//                      << vertices[i].z << " "
+//                << std::endl;
+//    }
+
+  glBindBuffer(GL_ARRAY_BUFFER, vboVert);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(), &vertices[0], GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
   if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
     exit(0);
+  }
+  if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+    frameChange++;
+  }
+  if (key == GLFW_KEY_K && action == GLFW_PRESS) {
+    frameChange--;
   }
 }
 
@@ -79,125 +157,215 @@ int main() {
   printf( "OpenGL version supported %s\n", version );
 
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_TEXTURE_2D);
   glDepthFunc(GL_LESS);
+  glLineWidth(3.0);
+  glPointSize(5.0);
 
-  int width = 800;
-  int height = 600;
+  int width = 512;
+  int height = 512;
 
-  ilInit();
-  iluInit();
-  ilutInit();
-  ilutRenderer(ILUT_OPENGL);
 
-//  GLuint texture;
-//  glGenTextures(1, &texture);
-//  glBindTexture(GL_TEXTURE_2D, texture);
-//  glActiveTexture(GL_TEXTURE0);
+
+
+
+
+
+
+
+
+
+  glm::vec3 bvh_scale = glm::vec3(0.25, 0.25, 0.25);
+
+    k::Shader bvhShader;
+    bvhShader.loadShader("shader1");
+    bvh = new k::Bvh;
+    bvh->load("../data/bvh/0008_ChaCha001.bvh");
+    bvh->testOutput();
+    bvh->printJoint(bvh->getRootJoint());
+    bvh->moveTo(frame++);
+
+
+    std::vector<glm::vec4> vertices;
+    std::vector<GLshort> bvhindices;
+
+
+    tmpProcess((k::JOINT*)bvh->getRootJoint(), vertices, bvhindices);
+
+    bvh_elements = bvhindices.size();
+
+    glGenBuffers(1, &vboVert);
+    glBindBuffer(GL_ARRAY_BUFFER, vboVert);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(), &vertices[0], GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenBuffers(1, &vboIndices);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndices);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(bvhindices[0]) * bvhindices.size(), &bvhindices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+
+    bvhShader.use();
+
+    GLint sLocPosition = bvhShader.attribute("vPosition");
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboVert);
+    glEnableVertexAttribArray(sLocPosition);
+    glVertexAttribPointer(sLocPosition, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndices);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindVertexArray(0);
+
+
+  for (int i = 0; i < vertices.size(); i++) {
+    std::cout << "vertices "
+              << vertices[i].x << " "
+              << vertices[i].y << " "
+              << vertices[i].z << " "
+              << std::endl;
+  }
+
+
+
 
   k::Camera camera(width, height);
   glm::mat4 Model = glm::mat4(1.0f);
   glm::mat4 mvp = camera.matrix() * Model;
 
-  k::MeshData meshData("shader4");
-  k::MeshGraphics meshGraphics;
-
-  GLfloat* g_uv_buffer_data = new GLfloat[9] {
-      0.0f, 0.0f,  0.0f, 1.0f,   1.0f, 1.0f
-  };
-
-  {
-    GLuint* cube_elements = new GLuint[3] {
-      0, 1, 2
-    };
-
-    GLfloat* g_vertex_buffer_data = new GLfloat[9] {
-       -1.0f, -1.0f, 0.0f,
-       1.0f, -1.0f, 0.0f,
-       0.0f,  1.0f, 0.0f,
-    };
-
-    k::LoadedMeshData loadedData;
-    loadedData.elements = cube_elements;
-    loadedData.lenElements = 3;
-    loadedData.lenVertexBufferData = 9;
-    loadedData.vertexBufferData = g_vertex_buffer_data;
-
-    meshGraphics.loadMeshData(meshData, loadedData);
-
-    delete[] cube_elements;
-    delete[] g_vertex_buffer_data;
-  }
-
-  k::Shader& shader = meshData.shader();
-  meshGraphics.loadVerticesToShader(meshData, "vPosition");
 
 
 
 
 
-  k::GLMeshData& glMeshData = meshData.data();
-  glBindVertexArray(glMeshData.vao);
-  GLuint uvbuf;
-  glGenBuffers(1, &uvbuf);
-  glBindBuffer(GL_ARRAY_BUFFER, uvbuf);
-  glBufferData(GL_ARRAY_BUFFER,
-               sizeof(GLfloat) * 6, g_uv_buffer_data, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+      k::TextureLoader textureLoader;
+      k::MeshData meshData("shader4");
+      k::MeshGraphics meshGraphics;
 
-  shader.use();
-  GLint uvPos = glGetAttribLocation(shader.getProgram(), "uvPos");
-  std::cout << shader.getProgram() << "vertexuv pos" << uvPos << std::endl;
+      k::Shader& shader = meshData.shader();
+      {
+        GLfloat* texdata = new GLfloat[8] {
+            0.0f, 0.0f,   1.0f, 0.0f,   0.0f, 1.0f,   1.0f, 1.0f
+        };
 
-  glVertexAttribPointer(uvPos, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-  glEnableVertexAttribArray(uvPos);
-  glBindVertexArray(0);
+        // data for a fullscreen quad (this time with texture coords)
+        GLfloat* vertexData = new GLfloat[9] {
+            -1.0f, -1.0f, 0.0f,
+            1.0f, -1.0f, 0.0f,
+            0.0f,  1.0f, 0.0f,
+        };
+
+        GLuint* indexData = new GLuint[3] {
+            0, 1, 2,
+        };
+
+        // load meshdata (vertices and indicies)
+        k::LoadedMeshData loadedData;
+        loadedData.elements = indexData;
+        loadedData.lenElements = 3;
+        loadedData.vertexBufferData = vertexData;
+        loadedData.lenVertexBufferData = 9;
+        loadedData.texelData = texdata;
+        loadedData.lenTexelData = 8;
+
+        meshGraphics.loadMeshData(meshData, loadedData);
+
+        meshGraphics.loadTexelToShader(meshData, loadedData, "uvPos");
+        meshGraphics.loadVerticesToShader(meshData, loadedData, "vPosition");
+
+        delete[] indexData;
+        delete[] vertexData;
+      }
+
+      k::GLTexture texture = textureLoader.loadTexture("../data/images/texture.png");
+
+      shader.use();
+      GLuint MatrixID = shader.uniform("mvp");
+      glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp));
+
+      texture.textureLocation = glGetUniformLocation(shader.getProgram(), "tex");
+      shader.unuse();
+
+
+      camera.move(glm::vec3(-28.13f, 30.11f, 20.11f));
+
+      while (!glfwWindowShouldClose(window)) {
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClearDepth(1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 
-  ILuint ImageName;
-  ilGenImages(1, &ImageName);
-  ilBindImage(ImageName);
-  ilLoadImage("../data/images/texture.png");
-//  ILubyte *Data = ilGetData();
-  ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
 
-  GLuint textureID;
-  glGenTextures(1, &textureID);
-  glBindTexture(GL_TEXTURE_2D, textureID);
-  std::cout << "format 1" << (ilGetInteger(IL_IMAGE_FORMAT) == GL_RGB) << std::endl;
-  std::cout << "type 1" << (ilGetInteger(IL_IMAGE_TYPE) == GL_UNSIGNED_BYTE) << std::endl;
-//  glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT), width, height, 0, ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData());
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, ilGetInteger(IL_IMAGE_TYPE), ilGetData());
-  ilDeleteImage(ImageName);
-  GLuint samplerId = glGetUniformLocation(shader.getProgram(), "tex");
-  std::cout << "sampler id" << samplerId << std::endl;
-  glBindTexture(GL_TEXTURE_2D, 0);
 
-  shader.use();
-  GLuint MatrixID = shader.uniform("mvp");
-  glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp));
-  shader.unuse();
 
-  while (!glfwWindowShouldClose(window)) {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    shader.use();
-    GLuint MatrixID = shader.uniform("mvp");
-    glm::mat4 mvp_ = camera.matrix() * glm::mat4(1.0f);
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp_));
 
-    meshGraphics.renderMesh(meshData);
-    shader.unuse();
+        glm::mat4 mvp = camera.matrix();// * glm::translate(model, glm::vec3(15, 0, 0));
 
-    camera.move(glm::vec3(-0.01f, 0.0f, 0.0f));
+        bvhShader.use();
 
-    glfwSwapBuffers( window );
-    glfwPollEvents();
-  }
+        glm::mat4 _model = glm::scale(model, bvh_scale);
 
-  meshGraphics.cleanupMeshData(meshData);
+        mvp = camera.matrix() * _model;
+        glUniformMatrix4fv(bvhShader.uniform("MVP"), 1, GL_FALSE, glm::value_ptr(mvp));
 
-  return 0;
-}
+        update();
+        glBindVertexArray(vao);
+
+        glPointSize(5.0);
+        glDrawElements(GL_LINES, bvh_elements, GL_UNSIGNED_SHORT, (GLvoid*) 0);
+        glLineWidth(3.0);
+        glDrawElements(GL_POINTS, bvh_elements, GL_UNSIGNED_SHORT, (GLvoid*) 0);
+
+        glBindVertexArray(0);
+
+        bvhShader.unuse();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // use the shader program
+        shader.use();
+
+        // bind texture to texture unit 0
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture.texture);
+
+        // set texture uniform
+        glUniform1i(texture.textureLocation, 0);
+
+        GLuint MatrixID = shader.uniform("mvp");
+        glm::mat4 mvp_ = camera.matrix() * glm::mat4(1.0f);
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp_));
+
+        meshGraphics.renderMesh(meshData);
+        shader.unuse();
+
+//        camera.move(glm::vec3(-0.13f, 0.11f, 0.11f));
+
+//        std::cout << camera.getLocation().x << std::endl;
+
+        glfwSwapBuffers( window );
+        glfwPollEvents();
+      }
+
+      meshGraphics.cleanupMeshData(meshData);
+
+      return 0;
+    }

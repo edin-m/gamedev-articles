@@ -4,7 +4,6 @@
 
 namespace k {
 
-
 Bvh::Bvh()
     : rootJoint(NULL)
 {
@@ -13,14 +12,17 @@ Bvh::Bvh()
 
 void deleteJoint(JOINT* joint)
 {
-    if( joint == NULL )
+    if (joint == NULL) {
         return;
+    }
 
-    for(JOINT* child : joint->children)
+    for (JOINT* child : joint->children) {
         deleteJoint(child);
+    }
 
-    if( joint->channels_order != NULL )
+    if (joint->channels_order != NULL) {
         delete joint->channels_order;
+    }
 
 //    if( joint->name != NULL && joint->name != "EndSite" ){
 //        klog.l() << joint->name;
@@ -30,8 +32,7 @@ void deleteJoint(JOINT* joint)
     delete joint;
 }
 
-Bvh::~Bvh()
-{
+Bvh::~Bvh() {
 //    klog.l() << "Bvh destructor";
     deleteJoint(rootJoint);
 
@@ -44,45 +45,43 @@ Bvh::~Bvh()
 //    }
 
 
-    if( motionData.data != NULL )
+    if (motionData.data != NULL) {
         delete[] motionData.data;
+    }
 }
 
-void Bvh::load(const std::string& filename)
-{
+void Bvh::load(const std::string& filename) {
     std::fstream file;
     file.open(filename.c_str(), std::ios_base::in);
 
-    if( file.is_open() )
-    {
+    if (file.is_open()) {
         std::string line;
 
-        while( file.good() )
-        {
+        while(file.good()) {
             file >> line;
 //            klog.l("load") << line;
-            if( trim(line) == "HIERARCHY" )
+            if (trim(line) == "HIERARCHY") {
                 loadHierarchy(file);
+            }
             break;
         }
 
         file.close();
     }
-
-
 }
 
-void Bvh::printJoint(const JOINT* const joint) const
-{
+void Bvh::printJoint(const JOINT* const joint) const {
 //    klog.l("joint") << "print joint" << joint->name << joint->channel_start;
+//  std::cout << "joint " << joint->name << " " << joint->channel_start << std::endl;
 
     for(std::vector<JOINT*>::const_iterator ct = joint->children.begin();
         ct != joint->children.end(); ++ct)
     {
         JOINT* _tmp = *ct;
 
-        if( _tmp->children.size() > 0 )
+        if (_tmp->children.size() > 0) {
             printJoint(_tmp);
+        }
     }
 
 }
@@ -100,8 +99,7 @@ const Logger& operator<<(const Logger& logger, const glm::mat4& mat)
 */
 
 // calculate local transformation matrix for specific frame - revisit this
-void moveJoint(JOINT* joint, MOTION* motionData, int frame_starts_index)
-{
+void moveJoint(JOINT* joint, MOTION* motionData, int frame_starts_index) {
     int start_index = frame_starts_index + joint->channel_start;
 
     // postavljamo prvo lokalnu mat na offset poziciju
@@ -110,48 +108,44 @@ void moveJoint(JOINT* joint, MOTION* motionData, int frame_starts_index)
                                              joint->offset.y,
                                              joint->offset.z));
 
+//    std::cout << joint->name << " " << joint->num_channels << std::endl;
     for(int i = 0; i < joint->num_channels; i++)
     {
         const short& channel = joint->channels_order[i];
 
         float value = motionData->data[start_index + i];
-        if( channel & Xposition )
-        {
+        if (channel & Xposition) {
             joint->matrix = glm::translate(joint->matrix, glm::vec3(value, 0, 0));
         }
-        if( channel & Yposition )
-        {
+        if (channel & Yposition) {
             joint->matrix = glm::translate(joint->matrix, glm::vec3(0, value, 0));
         }
-        if( channel & Zposition )
-        {
+        if (channel & Zposition) {
             joint->matrix = glm::translate(joint->matrix, glm::vec3(0, 0, value));
         }
 
-        if( channel & Xrotation )
-        {
-            joint->matrix = glm::rotate(joint->matrix, value, glm::vec3(1, 0, 0));
+        if (channel & Xrotation) {
+            joint->matrix = glm::rotate(joint->matrix, glm::radians(value), glm::vec3(1, 0, 0));
         }
-        if( channel & Yrotation )
-        {
-            joint->matrix = glm::rotate(joint->matrix, value, glm::vec3(0, 1, 0));
+        if (channel & Yrotation) {
+            joint->matrix = glm::rotate(joint->matrix, glm::radians(value), glm::vec3(0, 1, 0));
         }
-        if( channel & Zrotation )
-        {
-            joint->matrix = glm::rotate(joint->matrix, value, glm::vec3(0, 0, 1));
+        if (channel & Zrotation) {
+            joint->matrix = glm::rotate(joint->matrix, glm::radians(value), glm::vec3(0, 0, 1));
         }
     }
 
     // mul current matrix with one of a parent
-    if( joint->parent != NULL )
+    if (joint->parent != NULL) {
         joint->matrix = joint->parent->matrix * joint->matrix;
+    }
 
-    for(auto& child : joint->children)
+    for (auto& child : joint->children) {
         moveJoint(child, motionData, frame_starts_index);
+    }
 }
 
-void Bvh::moveTo(unsigned frame)
-{
+void Bvh::moveTo(unsigned frame) {
     // calculate start index for specific frame for motion data
     unsigned start_index = frame * motionData.num_motion_channels;
 
@@ -159,13 +153,12 @@ void Bvh::moveTo(unsigned frame)
     moveJoint(rootJoint, &motionData, start_index);
 }
 
-void Bvh::testOutput() const
-{
+void Bvh::testOutput() const {
     if( rootJoint == 0 )
         return;
 
 //    klog.l() << "output";
-    printJoint(rootJoint);
+//    printJoint(rootJoint);
 
     std::cout << "num frames: " << motionData.num_frames << std::endl;
     std::cout << "num motion channels: " << motionData.num_motion_channels << std::endl;
@@ -175,7 +168,7 @@ void Bvh::testOutput() const
 
 //    for(int frame = 0; frame < num_frames; frame++)
 //    {
-//        klog.l() << "frame: " << frame;
+////        klog.l() << "frame: " << frame;
 
 ////        for(int channel = 0; channel < num_channels; channel++)
 ////        {
@@ -202,7 +195,7 @@ void Bvh::testOutput() const
 //        {
 //            JOINT* joint = *it;
 
-//            klog.l() << joint->name;
+////            klog.l() << joint->name;
 ////            if( joint->name == "EndSite" )
 ////                continue;
 
@@ -231,39 +224,33 @@ void Bvh::testOutput() const
 
 }
 
-void Bvh::loadHierarchy(std::istream& stream)
-{
+void Bvh::loadHierarchy(std::istream& stream) {
     std::string tmp;
 
-    while( stream.good() )
-    {
+    while (stream.good()) {
         stream >> tmp;
 //        klog.l("hier") << tmp;
 
-        if( trim(tmp) == "ROOT" )
+        if( trim(tmp) == "ROOT" ) {
             rootJoint = loadJoint(stream);
-        else if( trim(tmp) == "MOTION" )
+        } else if (trim(tmp) == "MOTION") {
             loadMotion(stream);
+        }
     }
 }
 
-void Bvh::loadMotion(std::istream& stream)
-{
+void Bvh::loadMotion(std::istream& stream) {
 //    klog.l() << "num joints:" << stats.num_total_joints;
 //    klog << stats.num_motion_channels;
 
     std::string tmp;
 
-    while( stream.good() )
-    {
+    while (stream.good()) {
         stream >> tmp;
 
-        if( trim(tmp) == "Frames:" )
-        {
+        if (trim(tmp) == "Frames:") {
             stream >> motionData.num_frames;
-        }
-        else if( trim(tmp) == "Frame" )
-        {
+        } else if (trim(tmp) == "Frame") {
             float frame_time;
             stream >> tmp >> frame_time;
 
@@ -275,10 +262,8 @@ void Bvh::loadMotion(std::istream& stream)
 
             motionData.data = new float[num_frames * num_channels];
 
-            for( int frame = 0; frame < num_frames; frame++ )
-            {
-                for( int channel = 0; channel < num_channels; channel++)
-                {
+            for (int frame = 0; frame < num_frames; frame++) {
+                for (int channel = 0; channel < num_channels; channel++) {
                     float x;
                     std::stringstream ss;
                     stream >> tmp;
@@ -293,13 +278,12 @@ void Bvh::loadMotion(std::istream& stream)
     }
 }
 
-JOINT* Bvh::loadJoint(std::istream& stream, JOINT* parent)
-{
+JOINT* Bvh::loadJoint(std::istream& stream, JOINT* parent) {
     JOINT* joint = new JOINT;
     joint->parent = parent;
+    joint->matrix = glm::mat4(1.0);
 
 //    stats.num_total_joints++;
-//    allJoints.insert(joint);
 
     // load joint name
     std::string* name = new std::string;
@@ -311,50 +295,42 @@ JOINT* Bvh::loadJoint(std::istream& stream, JOINT* parent)
 
     static int _channel_start = 0;
     unsigned channel_order_index = 0;
-    while( stream.good() )
-    {
+    while (stream.good()) {
         stream >> tmp;
         tmp = trim(tmp);
 
         // setting channels
         char c = tmp.at(0);
-        if( c == 'X' || c == 'Y' || c == 'Z' )
-        {
-            if( tmp == "Xposition" )
-            {
+        if (c == 'X' || c == 'Y' || c == 'Z') {
+            if (tmp == "Xposition") {
                 joint->channels_order[channel_order_index++] = Xposition;
             }
-            if( tmp == "Yposition" )
-            {
+            if (tmp == "Yposition") {
                 joint->channels_order[channel_order_index++] = Yposition;
             }
-            if( tmp == "Zposition" )
-            {
+            if (tmp == "Zposition") {
                 joint->channels_order[channel_order_index++] = Zposition;
             }
 
-            if( tmp == "Xrotation" )
-            {
+            if (tmp == "Xrotation") {
                 joint->channels_order[channel_order_index++] = Xrotation;
             }
-            if( tmp == "Yrotation" )
-            {
+            if (tmp == "Yrotation") {
                 joint->channels_order[channel_order_index++] = Yrotation;
             }
-            if( tmp == "Zrotation" )
-            {
+            if (tmp == "Zrotation") {
                 joint->channels_order[channel_order_index++] = Zrotation;
             }
         }
 
-        if( tmp == "OFFSET" )
-        {
+        if (tmp == "OFFSET") {
             stream  >> joint->offset.x
                     >> joint->offset.y
                     >> joint->offset.z;
-        }
-        else if( tmp == "CHANNELS" )
-        {
+            glm::mat4 mat = joint->parent == NULL ? glm::mat4(1.0) : joint->parent->matrix;
+//            joint->matrix = glm::translate(mat,
+//                                           glm::vec3(joint->offset.x, joint->offset.y, joint->offset.z));
+        } else if (tmp == "CHANNELS") {
             // loading num of channels
             stream >> joint->num_channels;
 
@@ -368,19 +344,13 @@ JOINT* Bvh::loadJoint(std::istream& stream, JOINT* parent)
             // creating array for channel order specification
             joint->channels_order = new short[joint->num_channels];
 
-        }
-        else if( tmp == "JOINT" )
-        {
+        } else if (tmp == "JOINT") {
             JOINT* tmp_joint = loadJoint(stream, joint);
 
             tmp_joint->parent = joint;
             joint->children.push_back(tmp_joint);
 
-//            allJoints.insert(tmp_joint);
-
-        }
-        else if( tmp == "End" )
-        {
+        } else if (tmp == "End") {
             // End Site {
             stream >> tmp >> tmp;
 
@@ -391,21 +361,20 @@ JOINT* Bvh::loadJoint(std::istream& stream, JOINT* parent)
             tmp_joint->name = "EndSite";
             joint->children.push_back(tmp_joint);
 
-//            allJoints.insert(tmp_joint);
-
             stream >> tmp;
-            if( tmp == "OFFSET" )
+            if (tmp == "OFFSET") {
                 stream >> tmp_joint->offset.x
                        >> tmp_joint->offset.y
                        >> tmp_joint->offset.z;
+            }
 
             // ucitavanje }
             stream >> tmp;
-        }
-        else if( tmp == "}" )
+        } else if (tmp == "}") {
             return joint;
-
+        }
     }
+    return joint;
 }
 
 }

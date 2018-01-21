@@ -42,6 +42,8 @@ public:
 
   glm::mat4 matrix() const { return projection * view; }
 
+  glm::vec3 getLocation() { return location; }
+
   float aspect() const { return m_aspect; }
   void  aspect(float ratio) { m_aspect = ratio; updateMatrices(); }
 
