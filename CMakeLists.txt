@@ -32,7 +32,9 @@ option(USE_DEVIL "Use DevIL" ON)
 option(USE_SOIL "Use SOIL" OFF)
 option(USE_ASSIMP "Use assimp" OFF)
 option(USE_OPENEXR "Use OpenEXR" OFF)
-option(USE_LOGGINGPP "Use loggingpp" ON)
+option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
+# Optionally one could use G3LOG instead of easylogger but it slows down compilation
+option(USE_G3LOG "Use G3LOG" OFF)
 
 # default to release
 if (NOT CMAKE_BUILD_TYPE)
@@ -128,10 +130,27 @@ endif()
 #  add_subdirectory(${EXT_LIB_DIR}/openexr/OpenEXR)
 #endif()
 
-if (USE_LOGGINGPP)
+if (USE_EASYLOGGINGPP)
+  # EASY_LOGGER is switched on by defualt
   set(build_static_lib ON CACHE BOOL "" FORCE)
-  add_subdirectory(${EXT_LIB_DIR}/loggingpp)
-  set(EXT_LIBS ${EXT_LIBS} ${easyloggingpp_LIBRARIES})
+  set(test OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${EXT_LIB_DIR}/easyloggingpp)
+  include_directories(${EXT_LIB_DIR}/easyloggingpp/src)
+  set(EXT_LIBS ${EXT_LIBS} easyloggingpp)
+  add_definitions(-DLIB_EASYLOGGING)
+endif()
+
+if (USE_G3LOG)
+  set(G3_SHARED_LIB OFF CACHE BOOL "" FORCE)
+  set(ADD_FATAL_EXAMPLE OFF CACHE BOOL "" FORCE)
+  set(ADD_G3LOG_PERFORMANCE OFF CACHE BOOL "" FORCE)
+  set(ADD_G3LOG_UNIT_TEST OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${EXT_LIB_DIR}/g3log)
+  SET(GENERATED_G3_DEFINITIONS "${CMAKE_CURRENT_BINARY_DIR}/lib/g3log/include")
+  include_directories(${G3LOG_INCLUDE_DIR}/src)
+  include_directories(${GENERATED_G3_DEFINITIONS})
+  set(EXT_LIBS ${EXT_LIBS} g3logger)
+  add_definitions(-DLIB_G3LOG)
 endif()
 
 ## GLFM - ios/andriod glfw

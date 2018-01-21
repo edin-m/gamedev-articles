@@ -5,7 +5,8 @@ set(SRCLIB_SOURCES
   meshgraphics.cpp
   glcheck.cpp
   textureloader.cpp
-  shader.cpp)
+  shader.cpp
+)
 
 add_library(srclib
   STATIC

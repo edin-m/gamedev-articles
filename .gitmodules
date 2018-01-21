@@ -25,13 +25,13 @@
 [submodule "lib/openexr"]
 	path = lib/openexr
 	url = https://github.com/openexr/openexr.git
-[submodule "lib/loggingpp"]
-	path = lib/loggingpp
-	url = https://github.com/muflihun/easyloggingpp.git
 [submodule "lib/glfm"]
 	path = lib/glfm
 	url = https://github.com/brackeen/glfm.git
     branch = 8b6973dbc83acdcad58a168e44871de414773d9d
-[submodule "tools/glsl-validator"]
-	path = tools/glsl-validator
-	url = https://github.com/felixpalmer/glsl-validator
+[submodule "lib/easyloggingpp"]
+	path = lib/easyloggingpp
+	url = https://github.com/muflihun/easyloggingpp.git
+[submodule "lib/g3log"]
+	path = lib/g3log
+	url = https://github.com/KjellKod/g3log.git

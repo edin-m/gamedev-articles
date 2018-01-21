@@ -28,9 +28,8 @@
 #include "meshloader.h"
 #include "textureloader.h"
 
-#include "IL/il.h"
-#include "IL/ilu.h"
-#include "IL/ilut.h"
+#include "easylogging++.h"
+INITIALIZE_EASYLOGGINGPP
 
 #include "glcheck.h"
 
@@ -119,11 +118,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
   }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+  START_EASYLOGGINGPP(argc, argv);
+  LOG(INFO) << "Test SLOG INFO";
+
   GLFWwindow* window = nullptr;
 
   if (!glfwInit()) {
-    fprintf( stderr, "ERROR: could not start GLFW3\n" );
+    LOG(ERROR) << "ERROR: could not start GLFW3";
     return 1;
   }
 
@@ -137,7 +139,7 @@ int main() {
   window = glfwCreateWindow(640, 480, "Hello world", nullptr, nullptr);
 
   if (!window) {
-    fprintf( stderr, "ERROR: could not open window with GLFW3\n" );
+    LOG(ERROR) << "ERROR: could not open window with GLFW3";
     glfwTerminate();
     return 1;
   }
@@ -153,8 +155,8 @@ int main() {
   /* get version info */
   renderer = glGetString( GL_RENDERER ); /* get renderer string */
   version = glGetString( GL_VERSION );	 /* version as a string */
-  printf( "Renderer: %s\n", renderer );
-  printf( "OpenGL version supported %s\n", version );
+  LOG(INFO) << "Renderer: " << renderer;
+  LOG(INFO) << "OpenGL version supported" << version;
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
@@ -357,9 +359,8 @@ int main() {
         meshGraphics.renderMesh(meshData);
         shader.unuse();
 
-//        camera.move(glm::vec3(-0.13f, 0.11f, 0.11f));
 
-//        std::cout << camera.getLocation().x << std::endl;
+
 
         glfwSwapBuffers( window );
         glfwPollEvents();
