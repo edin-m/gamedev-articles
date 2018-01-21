@@ -1,5 +1,5 @@
 
-set(SOURCES main.cpp)
+set(SOURCES main.cpp bvh.cpp)
 
 add_executable(bvh-loader ${SOURCES})
 target_link_libraries(bvh-loader srclib)

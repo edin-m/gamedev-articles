@@ -1,6 +1,5 @@
 
 set(SRCLIB_SOURCES
-  bvh/bvh.cpp
   meshdata.cpp
   meshloader.cpp
   meshgraphics.cpp

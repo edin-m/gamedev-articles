@@ -19,7 +19,7 @@
 
 #include "shader.h"
 
-#include "bvh/bvh.h"
+#include "bvh.h"
 
 #include "camera.h"
 
