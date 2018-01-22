@@ -86,27 +86,38 @@ if (USE_GLEW)
   endif()
 
   add_definitions(-DGLEW_STATIC)
-  set(GLEW_USE_STATIC_LIBS ON)
+  set(GLEW_USE_STATIC_LIBS ON CACHE BOOL "" FORCE)
+  set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
   add_subdirectory(${EXT_LIB_DIR}/glew-2.1.0/build/cmake)
-  set(EXT_LIBS ${EXT_LIBS} glew)
   include_directories(${EXT_LIB_DIR}/glew-2.1.0/include)
 
   set(GLEW_INCLUDE_PATH ${EXT_LIB_DIR}/glew-2.1.0/include)
-  set(GLEW_LIBRARY glew)
+  
+  if (WIN32)
+    set (GLEW_LIB_NAME libglew32)
+	link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/Release)
+  else ()
+    set (GLEW_LIB_NAME glew)
+  endif()
+  
+  set(GLEW_glew_LIBRARY ${GLEW_LIB_NAME})
+  set(EXT_LIBS ${EXT_LIBS} ${GLEW_LIB_NAME})
 endif (USE_GLEW)
 
 # GLM
 include_directories(${EXT_LIB_DIR}/glm)
 
-# TODO
-#if (WIN32 AND USE_GLUT)
-#  set(FREEGLUT_BUILD_SHARED_LIBS OFF)
-#  set(FREEGLUT_BUILD_STATIC_LIBS ON)
-#  set(FREEGLUT_REPLACE_GLUT ON)
-#  set(FREEGLUT_BUILD_DEMOS OFF)
-#  add_subdirectory(${EXT_LIB_DIR}/freeglut)
-#  include_directories(${GIT_ROOT}/freeglut/include)
-#endif()
+# Use glut on win32 / some libraries want glut
+if (WIN32 AND USE_GLUT)
+  set(FREEGLUT_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+  set(FREEGLUT_BUILD_STATIC_LIBS ON CACHE BOOL "" FORCE)
+  set(FREEGLUT_REPLACE_GLUT ON CACHE BOOL "" FORCE)
+  set(FREEGLUT_BUILD_DEMOS  OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${EXT_LIB_DIR}/freeglut)
+  include_directories(${GIT_ROOT}/freeglut/include)
+  set(GLUT_glut_LIBRARY freeglut_static)
+  set(GLUT_INCLUDE_DIR ${GIT_ROOT}/freeglut/include)
+endif()
 
 # DEVIL
 if (USE_DEVIL)
