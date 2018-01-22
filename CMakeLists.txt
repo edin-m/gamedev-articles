@@ -29,12 +29,19 @@ endif()
 option(USE_GLFW "Use GLFW" ON)
 option(USE_GLEW "Use GLEW" ON)
 option(USE_DEVIL "Use DevIL" ON)
+option(USE_GLUT "Use GLUT" ON)
 option(USE_SOIL "Use SOIL" OFF)
 option(USE_ASSIMP "Use assimp" OFF)
 option(USE_OPENEXR "Use OpenEXR" OFF)
 option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
+option(USE_FREETYPEGL "Use freetype gl" OFF)
 # Optionally one could use G3LOG instead of easylogger but it slows down compilation
 option(USE_G3LOG "Use G3LOG" OFF)
+
+# ILUT needs GLUT on windows
+if (WIN32 AND USE_DEVIL)
+  set(USE_GLUT ON)
+endif()
 
 # default to release
 if (NOT CMAKE_BUILD_TYPE)
@@ -59,6 +66,7 @@ if (USE_GLFW)
   set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
   add_subdirectory(${EXT_LIB_DIR}/glfw)
   set(EXT_LIBS ${EXT_LIBS} glfw)
+  set(GLFW_INCLUDE_DIR ${EXT_LIB_DIR}/glfw/include)
 endif (USE_GLFW)
 
 if (APPLE AND (NOT USE_GLEW))
@@ -68,7 +76,7 @@ endif ()
 if (USE_GLEW)
   if (NOT EXISTS ${GIT_ROOT}/lib_bin/glew-2.1.0.zip)
     execute_process(
-        COMMAND wget -P ${GIT_ROOT}/lib_bin https://netcologne.dl.sourceforge.net/project/glew/glew/2.1.0/glew-2.1.0.zip
+        COMMAND wget --no-check-certificate -P ${GIT_ROOT}/lib_bin https://netcologne.dl.sourceforge.net/project/glew/glew/2.1.0/glew-2.1.0.zip
     )
   endif ()
   if (NOT EXISTS ${GIT_ROOT}/lib/glew-2.1.0)
@@ -82,10 +90,23 @@ if (USE_GLEW)
   add_subdirectory(${EXT_LIB_DIR}/glew-2.1.0/build/cmake)
   set(EXT_LIBS ${EXT_LIBS} glew)
   include_directories(${EXT_LIB_DIR}/glew-2.1.0/include)
+
+  set(GLEW_INCLUDE_PATH ${EXT_LIB_DIR}/glew-2.1.0/include)
+  set(GLEW_LIBRARY glew)
 endif (USE_GLEW)
 
 # GLM
 include_directories(${EXT_LIB_DIR}/glm)
+
+# TODO
+#if (WIN32 AND USE_GLUT)
+#  set(FREEGLUT_BUILD_SHARED_LIBS OFF)
+#  set(FREEGLUT_BUILD_STATIC_LIBS ON)
+#  set(FREEGLUT_REPLACE_GLUT ON)
+#  set(FREEGLUT_BUILD_DEMOS OFF)
+#  add_subdirectory(${EXT_LIB_DIR}/freeglut)
+#  include_directories(${GIT_ROOT}/freeglut/include)
+#endif()
 
 # DEVIL
 if (USE_DEVIL)
@@ -138,6 +159,20 @@ if (USE_EASYLOGGINGPP)
   include_directories(${EXT_LIB_DIR}/easyloggingpp/src)
   set(EXT_LIBS ${EXT_LIBS} easyloggingpp)
   add_definitions(-DLIB_EASYLOGGING)
+endif()
+
+if (USE_FREETYPEGL)
+  set(freetype-gl_WITH_GLEW ON)
+  set(freetype-gl_USE_VAO ON)
+  set(freetype-gl_BUILD_DEMOS OFF)
+  set(freetype-gl_BUILD_APIDOC OFF)
+  # harfbuzz is experimental => turn it off
+  set(freetype-gl_BUILD_HARFBUZZ OFF)
+  set(freetype-gl_BUILD_MAKEFONT ON)
+  set(freetype-gl_BUILD_TESTS OFF)
+  add_subdirectory(${EXT_LIB_DIR}/freetype-gl)
+  include_directories(${EXT_LIB_DIR}/freetype-gl)
+  set(EXT_LIBS ${EXT_LIBS} freetype-gl)
 endif()
 
 if (USE_G3LOG)

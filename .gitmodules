@@ -35,3 +35,9 @@
 [submodule "lib/g3log"]
 	path = lib/g3log
 	url = https://github.com/KjellKod/g3log.git
+[submodule "lib/freeglut"]
+	path = lib/freeglut
+	url = https://github.com/dcnieho/FreeGLUT.git
+[submodule "lib/freetype-gl"]
+	path = lib/freetype-gl
+	url = https://github.com/rougier/freetype-gl.git

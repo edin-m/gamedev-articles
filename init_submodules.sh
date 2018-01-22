@@ -27,3 +27,11 @@ cd ../..
 cd lib/openexr
 git checkout v2.2.1
 cd ../..
+
+cd lib/freeglut
+git checkout FG_3_0_0
+cd ../..
+
+cd lib/freetype-gl
+git checkout 507cc68511465981d32257268fee184b79cc69f7
+cd ../..
