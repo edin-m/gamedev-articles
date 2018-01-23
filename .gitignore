@@ -36,7 +36,7 @@ gamedev-articles.includes
 
 build
 bin
+lib/glew*
 lib_bin/*.zip
-lib/glew-2.1.0
 lib/DevIL Windows SDK/
 

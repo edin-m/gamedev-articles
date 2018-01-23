@@ -12,7 +12,7 @@ void CheckOpenGLError(const char* stmt, const char* fname, int line);
 }
 
 #ifndef GL_CHECK
-#ifdef _DEBUG
+#ifdef TRUE // _DEBUG
 #define GL_CHECK(stmt) do { \
 stmt; \
 k::CheckOpenGLError(#stmt, __FILE__, __LINE__); \

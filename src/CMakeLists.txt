@@ -4,9 +4,14 @@ set(SRCLIB_SOURCES
   meshloader.cpp
   meshgraphics.cpp
   glcheck.cpp
-  textureloader.cpp
   shader.cpp
 )
+
+if (USE_DEVIL)
+  list(APPEND SRCLIB_SOURCES
+    textureloader.cpp
+  )
+endif()
 
 add_library(srclib
   STATIC

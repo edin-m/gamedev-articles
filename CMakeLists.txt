@@ -9,6 +9,7 @@ set(SRC_PATH ${GIT_ROOT}/src)
 set(EXT_LIB_DIR ${GIT_ROOT}/lib)
 
 set(EXECUTABLE_OUTPUT_PATH ${GIT_ROOT}/bin)
+file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
 #set(LIBRARY_OUTPUT_PATH ${GIT_ROOT}/bin)
 
 include_directories("${SRC_PATH}")
@@ -34,7 +35,7 @@ option(USE_SOIL "Use SOIL" OFF)
 option(USE_ASSIMP "Use assimp" OFF)
 option(USE_OPENEXR "Use OpenEXR" OFF)
 option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
-option(USE_FREETYPEGL "Use freetype gl" OFF)
+option(USE_FREETYPE_GL "Use freetype gl" OFF)
 # Optionally one could use G3LOG instead of easylogger but it slows down compilation
 option(USE_G3LOG "Use G3LOG" OFF)
 
@@ -100,7 +101,7 @@ if (USE_GLEW)
     set (GLEW_LIB_NAME glew)
   endif()
   
-  set(GLEW_glew_LIBRARY ${GLEW_LIB_NAME})
+  set(GLEW_LIBRARY ${GLEW_LIB_NAME})
   set(EXT_LIBS ${EXT_LIBS} ${GLEW_LIB_NAME})
 endif (USE_GLEW)
 
@@ -194,18 +195,18 @@ if (USE_EASYLOGGINGPP)
   add_definitions(-DLIB_EASYLOGGING)
 endif()
 
-if (USE_FREETYPEGL)
-  set(freetype-gl_WITH_GLEW ON)
-  set(freetype-gl_USE_VAO ON)
-  set(freetype-gl_BUILD_DEMOS OFF)
-  set(freetype-gl_BUILD_APIDOC OFF)
+if (USE_FREETYPE_GL)
+  set(freetype-gl_WITH_GLEW ON CACHE BOOL "" FORCE)
+  set(freetype-gl_USE_VAO ON CACHE BOOL "" FORCE)
+  set(freetype-gl_BUILD_DEMOS OFF CACHE BOOL "" FORCE)
+  set(freetype-gl_BUILD_APIDOC OFF CACHE BOOL "" FORCE)
   # harfbuzz is experimental => turn it off
-  set(freetype-gl_BUILD_HARFBUZZ OFF)
-  set(freetype-gl_BUILD_MAKEFONT ON)
-  set(freetype-gl_BUILD_TESTS OFF)
+  set(freetype-gl_BUILD_HARFBUZZ OFF CACHE BOOL "" FORCE)
+  set(freetype-gl_BUILD_MAKEFONT ON CACHE BOOL "" FORCE)
+  set(freetype-gl_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   add_subdirectory(${EXT_LIB_DIR}/freetype-gl)
   include_directories(${EXT_LIB_DIR}/freetype-gl)
-  set(EXT_LIBS ${EXT_LIBS} freetype-gl)
+  set(EXT_LIBS ${EXT_LIBS} freetype freetype-gl)
 endif()
 
 if (USE_G3LOG)
@@ -235,6 +236,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${EXECUTABLE_OUTPUT_PATH} )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${EXECUTABLE_OUTPUT_PATH} )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${EXECUTABLE_OUTPUT_PATH} )
 endif()
+
 add_subdirectory(projects)
 
 

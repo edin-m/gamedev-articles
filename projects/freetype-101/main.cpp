@@ -23,10 +23,10 @@
 #include "demos/shader.h"
 #include "vertex-buffer.h"
 #include "utf8-utils.h"
-#include "demos/screenshot-util.h"
+//#include "demos/screenshot-util.h"
 
-#include <GLFW/glfw3.h>
 
+#include "glcheck.h"
 
 // ------------------------------------------------------- global variables ---
 GLuint shader;
@@ -39,7 +39,7 @@ mat4 model, view, projection;
 void init( void )
 {
     atlas = texture_atlas_new( 512, 512, 1 );
-    const char *filename = "fonts/Vera.ttf";
+    const char *filename = "../data/fonts/Vera.ttf";
     const char * cache = " !\"#$%&'()*+,-./0123456789:;<=>?"
                          "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
                          "`abcdefghijklmnopqrstuvwxyz{|}~";
@@ -87,8 +87,9 @@ void init( void )
     buffer = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
     vertex_buffer_push_back( buffer, vertices, 4, indices, 6 );
 
-    shader = shader_load("shaders/v3f-t2f-c4f.vert",
-                         "shaders/v3f-t2f-c4f.frag");
+    shader = shader_load("data/freetype-101/shaders/v3f-t2f-c4f.vert",
+                         "data/freetype-101/shaders/v3f-t2f-c4f.frag");
+    std::cout << "after shader load" << shader << std::endl;
     mat4_set_identity( &projection );
     mat4_set_identity( &model );
     mat4_set_identity( &view );
@@ -99,7 +100,7 @@ void init( void )
 void display( GLFWwindow* window )
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glUseProgram( shader );
+    GL_CHECK(glUseProgram( shader ));
     {
         glUniform1i( glGetUniformLocation( shader, "texture" ),
                      0 );
@@ -183,7 +184,7 @@ int main( int argc, char **argv )
     glfwSetWindowRefreshCallback( window, display );
     glfwSetKeyCallback( window, keyboard );
 
-#ifndef __APPLE__
+//#ifndef __APPLE__
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
     if (GLEW_OK != err)
@@ -193,7 +194,7 @@ int main( int argc, char **argv )
         exit( EXIT_FAILURE );
     }
     fprintf( stderr, "Using GLEW %s\n", glewGetString(GLEW_VERSION) );
-#endif
+//#endif
 
     init();
 
@@ -205,11 +206,11 @@ int main( int argc, char **argv )
         display( window );
         glfwPollEvents( );
 
-        if (screenshot_path)
-        {
-            screenshot( window, screenshot_path );
-            glfwSetWindowShouldClose( window, 1 );
-        }
+//        if (screenshot_path)
+//        {
+//            screenshot( window, screenshot_path );
+//            glfwSetWindowShouldClose( window, 1 );
+//        }
     }
 
     glDeleteTextures( 1, &atlas->id );
