@@ -14,8 +14,6 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_inverse.hpp"
 
-#include "unistd.h"
-
 #include "shader.h"
 
 #define BUFFER_OFFSET(offset) ((void *)(offset))
@@ -38,8 +36,8 @@ int main() {
 #if APPLE
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   window = glfwCreateWindow(640, 480, "Hello world", nullptr, nullptr);

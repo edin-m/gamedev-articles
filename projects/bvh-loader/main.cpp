@@ -15,10 +15,6 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_inverse.hpp"
 
-#include "unistd.h"
-
-#include "shader.h"
-
 #include "bvh.h"
 
 #include "camera.h"

@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <string>
+#include <cctype>
+#include <functional>
 
 namespace k {
 

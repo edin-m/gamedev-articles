@@ -29,7 +29,7 @@ endif()
 option(USE_GLFW "Use GLFW" ON)
 option(USE_GLEW "Use GLEW" ON)
 option(USE_DEVIL "Use DevIL" ON)
-option(USE_GLUT "Use GLUT" ON)
+option(USE_GLUT "Use GLUT" OFF)
 option(USE_SOIL "Use SOIL" OFF)
 option(USE_ASSIMP "Use assimp" OFF)
 option(USE_OPENEXR "Use OpenEXR" OFF)
@@ -120,7 +120,7 @@ if (WIN32 AND USE_GLUT)
 endif()
 
 # DEVIL
-if (USE_DEVIL)
+if (NOT WIN32 AND USE_DEVIL)
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
   set(IL_TESTS OFF CACHE BOOL "" FORCE)
   add_subdirectory(${EXT_LIB_DIR}/DevIL/DevIL)
@@ -135,6 +135,28 @@ if (USE_DEVIL)
 #  set_target_properties(ILUT PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GIT_ROOT}/bin")
   set(EXT_LIBS ${EXT_LIBS} IL ILU ILUT)
   include_directories(${GIT_ROOT}/lib/DevIL/DevIL/include)
+endif()
+
+# DevIL has many dependencies, like libpng libjpeg, etc... not available on win by default
+# so download precompiled binaries
+if (WIN32 AND USE_DEVIL)
+  if (NOT EXISTS ${GIT_ROOT}/lib_bin/DevIL-Windows-SDK-1.8.0.zip)
+    execute_process(
+        COMMAND wget --no-check-certificate -P ${GIT_ROOT}/lib_bin https://vorboss.dl.sourceforge.net/project/openil/DevIL%20Windows%20SDK/1.8.0/DevIL-Windows-SDK-1.8.0.zip
+    )
+  endif()
+  if (NOT EXISTS ${GIT_ROOT}/lib/DevIL\ Windows\ SDK)
+    execute_process(
+      COMMAND unzip ${GIT_ROOT}/lib_bin/DevIL-Windows-SDK-1.8.0.zip -d ${GIT_ROOT}/lib
+    )
+  endif()
+  set(DEVIL_SDK_DIR ${GIT_ROOT}/lib/DevIL\ Windows\ SDK)
+  set(DEVIL_SDK_LIB_DIR ${GIT_ROOT}/lib/DevIL\ Windows\ SDK/lib/x86/Release)
+  include_directories(${DEVIL_SDK_DIR}/include)
+  link_directories(${DEVIL_SDK_LIB_DIR})
+  set(EXT_LIBS ${EXT_LIBS} DevIL ILU ILUT)
+  file(GLOB DevilDlls ${DEVIL_SDK_LIB_DIR}/*.dll)
+  file(COPY ${DevilDlls} DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 endif()
 
 if (USE_SOIL)
@@ -206,6 +228,13 @@ endif()
 
 message(${EXT_LIBS})
 add_subdirectory(src)
+
+if (MSVC)
+# output projects to bin dir for MSVS
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${EXECUTABLE_OUTPUT_PATH} )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${EXECUTABLE_OUTPUT_PATH} )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${EXECUTABLE_OUTPUT_PATH} )
+endif()
 add_subdirectory(projects)
 
 
