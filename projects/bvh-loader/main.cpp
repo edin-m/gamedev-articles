@@ -16,6 +16,7 @@
 #include "glm/gtc/matrix_inverse.hpp"
 
 #include "bvh.h"
+#include "bvhloader.h"
 
 #include "camera.h"
 
@@ -31,11 +32,8 @@ INITIALIZE_EASYLOGGINGPP
 
 #define BUFFER_OFFSET(offset) ((void *)(offset))
 
-
-
 static GLuint vboVert, vboIndices;
 static GLuint vao;
-
 
 float rotationAngle = 0.0f;
 
@@ -177,8 +175,10 @@ int main(int argc, char* argv[]) {
     k::Shader bvhShader;
     bvhShader.loadShader("shader1");
     bvh = new k::Bvh;
-    bvh->load("../data/bvh/0008_ChaCha001.bvh");
-    bvh->testOutput();
+    {
+      k::BvhLoader bvhLoader;
+      bvhLoader.load(bvh, "../data/bvh/0008_ChaCha001.bvh");
+    }
     bvh->printJoint(bvh->getRootJoint());
     bvh->moveTo(frame++);
 

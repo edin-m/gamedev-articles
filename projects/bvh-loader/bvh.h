@@ -1,36 +1,19 @@
 #ifndef BVH_H
 #define BVH_H
 
-#include <string>
-#include <fstream>
 #include <vector>
-#include <set>
-#include <sstream>
-#include <algorithm>
 
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
-#include "util.h"
-
-#define Xposition 0x01
-#define Yposition 0x02
-#define Zposition 0x04
-#define Zrotation 0x10
-#define Xrotation 0x20
-#define Yrotation 0x40
 
 namespace k {
 
-typedef struct
-{
+typedef struct {
     float x, y, z;
 } OFFSET;
 
 typedef struct JOINT JOINT;
 
-struct JOINT
-{
+struct JOINT {
     // joint name
     const char* name = NULL;
 
@@ -42,9 +25,6 @@ struct JOINT
 
     // num of channels joint has
     unsigned int num_channels = 0;
-
-    // binary or-ed channels - obsolete
-//    short channels;
 
     // ordered list of channels
     short* channels_order = NULL;
@@ -59,22 +39,19 @@ struct JOINT
     unsigned int channel_start = 0;
 };
 
-typedef struct
-{
+typedef struct {
     JOINT* rootJoint;
     int num_channels;
 } HIERARCHY;
 
-typedef struct
-{
-    unsigned int num_frames;            // koliko frameova motion ima
-    unsigned int num_motion_channels = 0;   // koliko channela je upisan u jedan frame
-    float* data = NULL;                        // pocetak motion float-ova
-    unsigned* joint_channel_offsets;    // broj kanala od pocetka hijerarhije za i-ti joint
+typedef struct {
+    unsigned int num_frames;
+    unsigned int num_motion_channels = 0;
+    float* data = NULL;
+    unsigned* joint_channel_offsets;
 } MOTION;
 
-typedef struct
-{
+typedef struct {
     unsigned int num_hierarchies;
     unsigned int num_total_joints;
     unsigned int num_motion_channels = 0;
@@ -85,20 +62,12 @@ typedef struct
 /**
  * @brief The Bvh class
  */
-
-class Bvh
-{
-    JOINT* loadJoint(std::istream& stream, JOINT* parent = NULL);
-    void loadHierarchy(std::istream& stream);
-    void loadMotion(std::istream& stream);
-
+class Bvh {
 public:
     Bvh();
     ~Bvh();
 
-    void load(const std::string& filename);
-    void testOutput() const;
-    void printJoint(const JOINT* const joint) const;
+    void printJoint(const JOINT* const joint);
 
     void moveTo(unsigned frame);
 
@@ -107,11 +76,9 @@ public:
 private:
     JOINT* rootJoint;
 
-    // parsiranje je napravljeno za set ali set ne spasava u redu u kojem su upisani
-    // tj. postojani u MOTION dijelu
-//    std::set<JOINT*> allJoints;
     MOTION motionData;
-//    bvh_statistics stats;
+
+    friend class BvhLoader;
 };
 
 }

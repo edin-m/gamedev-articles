@@ -24,11 +24,11 @@ if (APPLE)
   add_definitions(-DAPPLE)
 endif()
 
-
 #option(BUILD_IOS "Build iOS projects" OFF)
 
+set(USE_GLEW ON)
+
 option(USE_GLFW "Use GLFW" ON)
-option(USE_GLEW "Use GLEW" ON)
 option(USE_DEVIL "Use DevIL" ON)
 option(USE_GLUT "Use GLUT" OFF)
 option(USE_SOIL "Use SOIL" OFF)
@@ -36,13 +36,8 @@ option(USE_ASSIMP "Use assimp" OFF)
 option(USE_OPENEXR "Use OpenEXR" OFF)
 option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
 option(USE_FREETYPE_GL "Use freetype gl" ON)
-# Optionally one could use G3LOG instead of easylogger but it slows down compilation
-option(USE_G3LOG "Use G3LOG" OFF)
 
-# ILUT needs GLUT on windows
-if (WIN32 AND USE_DEVIL)
-  set(USE_GLUT ON)
-endif()
+include(Projects.cmake)
 
 # default to release
 if (NOT CMAKE_BUILD_TYPE)
@@ -206,28 +201,14 @@ if (USE_FREETYPE_GL)
   set(freetype-gl_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   add_subdirectory(${EXT_LIB_DIR}/freetype-gl)
   include_directories(${EXT_LIB_DIR}/freetype-gl)
-  set(EXT_LIBS ${EXT_LIBS} freetype-gl)
+  set(EXT_LIBS ${EXT_LIBS} freetype freetype-gl)
   if (WIN32)
-	link_directories(${EXT_LIB_DIR}/freetype-gl/windows/freetype)
-	include_directories(${EXT_LIB_DIR}/freetype-gl/windows/freetype)
-	set(EXT_LIBS ${EXT_LIBS} freetype)
-	if (MSVC_VERSION GREATER_EQUAL 1900)
-		set(EXT_LIBS ${EXT_LIBS} legacy_stdio_definitions)
-	endif()
+    link_directories(${EXT_LIB_DIR}/freetype-gl/windows/freetype)
+    include_directories(${EXT_LIB_DIR}/freetype-gl/windows/freetype)
+    if (MSVC_VERSION GREATER_EQUAL 1900)
+      set(EXT_LIBS ${EXT_LIBS} legacy_stdio_definitions)
+    endif()
   endif()
-endif()
-
-if (USE_G3LOG)
-  set(G3_SHARED_LIB OFF CACHE BOOL "" FORCE)
-  set(ADD_FATAL_EXAMPLE OFF CACHE BOOL "" FORCE)
-  set(ADD_G3LOG_PERFORMANCE OFF CACHE BOOL "" FORCE)
-  set(ADD_G3LOG_UNIT_TEST OFF CACHE BOOL "" FORCE)
-  add_subdirectory(${EXT_LIB_DIR}/g3log)
-  SET(GENERATED_G3_DEFINITIONS "${CMAKE_CURRENT_BINARY_DIR}/lib/g3log/include")
-  include_directories(${G3LOG_INCLUDE_DIR}/src)
-  include_directories(${GENERATED_G3_DEFINITIONS})
-  set(EXT_LIBS ${EXT_LIBS} g3logger)
-  add_definitions(-DLIB_G3LOG)
 endif()
 
 ## GLFM - ios/andriod glfw

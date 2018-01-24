@@ -32,9 +32,6 @@
 [submodule "lib/easyloggingpp"]
 	path = lib/easyloggingpp
 	url = https://github.com/muflihun/easyloggingpp.git
-[submodule "lib/g3log"]
-	path = lib/g3log
-	url = https://github.com/KjellKod/g3log.git
 [submodule "lib/freeglut"]
 	path = lib/freeglut
 	url = https://github.com/dcnieho/FreeGLUT.git
