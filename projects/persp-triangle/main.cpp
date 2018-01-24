@@ -56,11 +56,16 @@ int main() {
 
   const GLubyte* renderer;
   const GLubyte* version;
+  int majorVersion;
+  int minorVersion;
   /* get version info */
   renderer = glGetString( GL_RENDERER ); /* get renderer string */
   version = glGetString( GL_VERSION );	 /* version as a string */
+  glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);	 /* version as a string */
+  glGetIntegerv( GL_MINOR_VERSION, &minorVersion);	 /* version as a string */
   printf( "Renderer: %s\n", renderer );
   printf( "OpenGL version supported %s\n", version );
+  printf( "OpenGL version supported %d.%d\n", majorVersion, minorVersion );
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);

@@ -1,4 +1,6 @@
 
+
+
 #include <stdio.h>
 #include <iostream>
 
@@ -14,7 +16,6 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_inverse.hpp"
 
-#include "unistd.h"
 
 #include "shader.h"
 
@@ -26,7 +27,7 @@
 //#include "demos/screenshot-util.h"
 
 
-#include "glcheck.h"
+//#include "glcheck.h"
 
 // ------------------------------------------------------- global variables ---
 GLuint shader;
@@ -100,7 +101,7 @@ void init( void )
 void display( GLFWwindow* window )
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    GL_CHECK(glUseProgram( shader ));
+    glUseProgram( shader );
     {
         glUniform1i( glGetUniformLocation( shader, "texture" ),
                      0 );
