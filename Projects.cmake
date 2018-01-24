@@ -26,8 +26,7 @@ endif()
 
 # DevIL
 if (
-  BUILD_TEXTURE_101 OR
-  BUILD_BVH_LOADER
+  BUILD_TEXTURE_101
 )
   set(USE_GLFW ON)
 endif()

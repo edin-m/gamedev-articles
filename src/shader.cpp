@@ -6,8 +6,6 @@
 
 namespace k {
 
-std::string Shader::path = "../data/shaders";
-
 Shader::Shader()
   : program(0) {
 
@@ -17,12 +15,12 @@ Shader::~Shader() {
   deleteShader();
 }
 
-GLuint Shader::loadShader(const std::string& name) {
+GLuint Shader::loadShader(const std::string& path) {
   deleteShader();
   this->name = name;
 
-  const std::string fragPath = path + "/" + name + ".frag";
-  const std::string vertPath = path + "/" + name + ".vert";
+  const std::string fragPath = path + ".frag";
+  const std::string vertPath = path + ".vert";
 
   GLuint fragid = loadShader(GL_FRAGMENT_SHADER, fragPath);
   GLuint vertid = loadShader(GL_VERTEX_SHADER, vertPath);

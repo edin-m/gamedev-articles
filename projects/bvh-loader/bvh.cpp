@@ -27,7 +27,7 @@ Bvh::Bvh()
 }
 
 void deleteJoint(JOINT* joint) {
-  if (joint == NULL) {
+  if (joint == nullptr) {
     return;
   }
 
@@ -35,8 +35,8 @@ void deleteJoint(JOINT* joint) {
     deleteJoint(child);
   }
 
-  if (joint->channels_order != NULL) {
-    delete joint->channels_order;
+  if (joint->channels_order != nullptr) {
+    delete[] joint->channels_order;
   }
 
   delete joint;
@@ -45,7 +45,7 @@ void deleteJoint(JOINT* joint) {
 Bvh::~Bvh() {
   deleteJoint(rootJoint);
 
-  if (motionData.data != NULL) {
+  if (motionData.data != nullptr) {
     delete[] motionData.data;
   }
 }
@@ -58,6 +58,32 @@ void Bvh::printJoint(const JOINT* const joint) {
       printJoint(_tmp);
     }
   }
+}
+
+void internalGenerateGeometry(JOINT* joint,
+                              std::vector<glm::vec4>& outVertices,
+                              std::vector<GLuint>& outIndicies,
+                              int parentIndex = 0)
+{
+  glm::vec4 translatedVertex = joint->matrix[3];
+
+  outVertices.push_back(translatedVertex);
+
+  GLshort myindex = outVertices.size() - 1;
+
+  if (parentIndex != myindex) {
+    outIndicies.push_back(parentIndex);
+    outIndicies.push_back(myindex);
+  }
+
+  for(auto& child : joint->children) {
+    internalGenerateGeometry(child, outVertices, outIndicies, myindex);
+  }
+}
+
+void Bvh::generateGeometry(std::vector<glm::vec4>& outVertices,
+                           std::vector<GLuint>& outIndicies) {
+  internalGenerateGeometry(rootJoint, outVertices, outIndicies);
 }
 
 // calculate local transformation matrix for specific frame - revisit this

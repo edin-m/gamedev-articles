@@ -12,7 +12,6 @@ MeshGraphics::MeshGraphics() {
 
 void MeshGraphics::loadMeshData(MeshData& meshData, LoadedMeshData& loadedMeshData) {
   GLuint* elements = loadedMeshData.elements;
-  GLfloat* vertices = loadedMeshData.vertexBufferData;
 
   GLMeshData& glMeshData = meshData.data();
 
@@ -42,6 +41,27 @@ void MeshGraphics::loadVerticesToShader(MeshData& meshData, const std::string& n
   glBindBuffer(GL_ARRAY_BUFFER, glMeshData.vbo);
   glVertexAttribPointer(vPos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
   glBindVertexArray(0);
+}
+
+GLuint MeshGraphics::loadVec4ToShader(
+    MeshData& meshData,
+    const std::string& shaderParamName,
+    std::vector<glm::vec4>& data,
+    GLint drawType
+) {
+  GL_CHECK(glBindVertexArray(meshData.data().vao));
+  GLuint buffer;
+  GL_CHECK(glGenBuffers(1, &buffer));
+  GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+  GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(data[0]) * data.size(), &data[0], drawType));
+
+  GLuint pos = meshData.shader().attribute(shaderParamName);
+  GL_CHECK(glEnableVertexAttribArray(pos));
+  GL_CHECK(glVertexAttribPointer(pos, 4, GL_FLOAT, GL_FALSE, 0, (void*) 0));
+
+  GL_CHECK(glBindVertexArray(0));
+
+  return buffer;
 }
 
 GLuint MeshGraphics::loadFloatBufferToShader(

@@ -99,9 +99,7 @@ JOINT* BvhLoader::loadJoint(Bvh* bvh, std::istream& stream, JOINT* parent) {
   joint->matrix = glm::mat4(1.0);
 
   // load joint name
-  std::string* name = new std::string;
-  stream >> *name;
-  joint->name = name->c_str();
+  stream >> joint->name;
 
   std::string tmp;
   joint->matrix = glm::mat4(1.0);

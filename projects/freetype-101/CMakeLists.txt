@@ -4,12 +4,7 @@ set(SOURCES
   ${EXT_LIB_DIR}/freetype-gl/demos/mat4.c
   ${EXT_LIB_DIR}/freetype-gl/demos/shader.c
   main.cpp
-  )
-
-set(DATA
-  shaders/v3f-t2f-c4f.frag
-  shaders/v3f-t2f-c4f.vert
-  )
+)
 
 add_executable(${PROJ_NAME} ${SOURCES})
 target_link_libraries(${PROJ_NAME} srclib)
@@ -21,4 +16,4 @@ add_custom_command(TARGET ${PROJ_NAME}
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DST}
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADERS_SRC} ${SHADERS_DST}
-  )
+)

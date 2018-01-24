@@ -2,6 +2,9 @@
 #define BVH_H
 
 #include <vector>
+#include <string>
+
+#include "GL/glew.h"
 
 #include "glm/glm.hpp"
 
@@ -15,10 +18,10 @@ typedef struct JOINT JOINT;
 
 struct JOINT {
     // joint name
-    const char* name = NULL;
+    std::string name;
 
     // joint parent
-    JOINT* parent = NULL;
+    JOINT* parent = nullptr;
 
     // offset data
     OFFSET offset;
@@ -27,7 +30,7 @@ struct JOINT {
     unsigned int num_channels = 0;
 
     // ordered list of channels
-    short* channels_order = NULL;
+    short* channels_order = nullptr;
 
     // joint's children
     std::vector<JOINT*> children;
@@ -47,7 +50,7 @@ typedef struct {
 typedef struct {
     unsigned int num_frames;
     unsigned int num_motion_channels = 0;
-    float* data = NULL;
+    float* data = nullptr;
     unsigned* joint_channel_offsets;
 } MOTION;
 
@@ -68,8 +71,8 @@ public:
     ~Bvh();
 
     void printJoint(const JOINT* const joint);
-
     void moveTo(unsigned frame);
+    void generateGeometry(std::vector<glm::vec4>& outVertices, std::vector<GLuint>& outIndicies);
 
     const JOINT* getRootJoint() const { return rootJoint; }
     unsigned getNumFrames() const { return motionData.num_frames; }

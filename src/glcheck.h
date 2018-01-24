@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#define BUFFER_OFFSET(offset) ((void *)(offset))
+
 namespace k {
 
 const char* GetOpenGLErrorString(int errId);
