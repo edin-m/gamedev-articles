@@ -18,11 +18,11 @@ TextureLoader::TextureLoader()
 GLTexture TextureLoader::loadTexture(const std::string& filename) {
   GLTexture glTexture;
 
-  GL_CHECK(glGenBuffers(1, &glTexture.texture));
-  GL_CHECK(glBindTexture(GL_TEXTURE_2D, glTexture.texture));
+  GL__(glGenBuffers(1, &glTexture.texture));
+  GL__(glBindTexture(GL_TEXTURE_2D, glTexture.texture));
 
-  GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-  GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+  GL__(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+  GL__(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
   ILuint image = ilGenImage();
   ilBindImage(image);
@@ -34,9 +34,9 @@ GLTexture TextureLoader::loadTexture(const std::string& filename) {
   glTexture.format = ilGetInteger(IL_IMAGE_FORMAT);
   glTexture.type = ilGetInteger(IL_IMAGE_TYPE);
 
-  GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, (GLint) glTexture.format, glTexture.width,
-                        glTexture.height, 0, (GLenum) glTexture.format, glTexture.type,
-                        ilGetData()));
+  GL__(glTexImage2D(GL_TEXTURE_2D, 0, (GLint) glTexture.format, glTexture.width,
+                    glTexture.height, 0, (GLenum) glTexture.format, glTexture.type,
+                    ilGetData()));
 
   ilDeleteImage(image);
 

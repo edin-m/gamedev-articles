@@ -57,17 +57,17 @@ GLuint Shader::loadShader(const std::string& path) {
 
 bool Shader::deleteShader() {
   if (program > 0) {
-    GL_CHECK(glDeleteProgram(program));
+    GL__(glDeleteProgram(program));
   }
   return true;
 }
 
 void Shader::use() {
-  GL_CHECK(glUseProgram(program));
+  GL__(glUseProgram(program));
 }
 
 void Shader::unuse() {
-  GL_CHECK(glUseProgram(0));
+  GL__(glUseProgram(0));
 }
 
 GLuint Shader::getProgram() const {
@@ -98,8 +98,8 @@ GLuint Shader::loadShader(GLuint type, const std::string& path) {
 
 GLuint Shader::uploadShader(GLenum type, const char* source) {
   GLuint shader = glCreateShader(type);
-  GL_CHECK(glShaderSource(shader, 1, (const GLchar**)&source, NULL));
-  GL_CHECK(glCompileShader(shader));
+  GL__(glShaderSource(shader, 1, (const GLchar**)&source, NULL));
+  GL__(glCompileShader(shader));
 
   return shader;
 }
@@ -108,15 +108,15 @@ GLuint Shader::createProgram(const std::vector<GLuint>& shaders) {
   GLuint _program = glCreateProgram();
   for(std::vector<GLuint>::const_iterator it = shaders.begin(); it != shaders.end(); ++it) {
     GLuint shader = (GLuint) *it;
-    GL_CHECK(glAttachShader(_program, shader));
+    GL__(glAttachShader(_program, shader));
   }
 
-  GL_CHECK(glLinkProgram(_program));
+  GL__(glLinkProgram(_program));
 
   for(std::vector<GLuint>::const_iterator it = shaders.begin(); it != shaders.end(); ++it) {
     GLuint shader = (GLuint) *it;
-    GL_CHECK(glDetachShader(_program, shader));
-    GL_CHECK(glDeleteShader(shader));
+    GL__(glDetachShader(_program, shader));
+    GL__(glDeleteShader(shader));
   }
 
   return _program;
@@ -130,7 +130,7 @@ GLint Shader::addAttribute(const std::string& attr) {
       return attributes[_attr];
     }
 
-    GLint attrloc = GL_CHECK(glGetAttribLocation(program, _attr));
+    GLint attrloc = GL__(glGetAttribLocation(program, _attr));
     if (attrloc == -1) {
       std::cout << "Could not find attribute location " << attr << std::endl;
     }
@@ -148,7 +148,7 @@ GLint Shader::addUniform(const std::string& uniform) {
       return uniforms[_uniform];
     }
 
-    GLint uniformloc = GL_CHECK(glGetUniformLocation(program, _uniform));
+    GLint uniformloc = GL__(glGetUniformLocation(program, _uniform));
     if (uniformloc == -1) {
       std::cout << "Could not find uniform location " << uniform << std::endl;
     }

@@ -80,7 +80,7 @@ int main() {
   glm::mat4 mvp = camera.matrix() * Model;
 
   k::TextureLoader textureLoader;
-  k::MeshData meshData("shader4");
+  k::MeshData meshData("data/texture-101/shaders/texture-101");
   k::MeshGraphics meshGraphics;
 
   k::Shader& shader = meshData.shader();
@@ -118,7 +118,7 @@ int main() {
     delete[] vertexData;
   }
 
-  k::GLTexture texture = textureLoader.loadTexture("../data/images/texture.png");
+  k::GLTexture texture = textureLoader.loadTexture("data/images/texture.png");
 
   shader.use();
   GLuint MatrixID = shader.uniform("mvp");

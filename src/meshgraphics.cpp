@@ -37,9 +37,10 @@ void MeshGraphics::loadVerticesToShader(MeshData& meshData, const std::string& n
 
   glBindVertexArray(glMeshData.vao);
   shader.use();
-  glEnableVertexAttribArray(vPos);
   glBindBuffer(GL_ARRAY_BUFFER, glMeshData.vbo);
+  glEnableVertexAttribArray(vPos);
   glVertexAttribPointer(vPos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+  glDisableVertexAttribArray(vPos);
   glBindVertexArray(0);
 }
 
@@ -49,17 +50,18 @@ GLuint MeshGraphics::loadVec4ToShader(
     std::vector<glm::vec4>& data,
     GLint drawType
 ) {
-  GL_CHECK(glBindVertexArray(meshData.data().vao));
+  GL__(glBindVertexArray(meshData.data().vao));
   GLuint buffer;
-  GL_CHECK(glGenBuffers(1, &buffer));
-  GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-  GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(data[0]) * data.size(), &data[0], drawType));
+  GL__(glGenBuffers(1, &buffer));
+  GL__(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+  GL__(glBufferData(GL_ARRAY_BUFFER, sizeof(data[0]) * data.size(), &data[0], drawType));
 
   GLuint pos = meshData.shader().attribute(shaderParamName);
-  GL_CHECK(glEnableVertexAttribArray(pos));
-  GL_CHECK(glVertexAttribPointer(pos, 4, GL_FLOAT, GL_FALSE, 0, (void*) 0));
+  GL__(glEnableVertexAttribArray(pos));
+  GL__(glVertexAttribPointer(pos, 4, GL_FLOAT, GL_FALSE, 0, (void*) 0));
+  GL__(glDisableVertexAttribArray(pos));
 
-  GL_CHECK(glBindVertexArray(0));
+  GL__(glBindVertexArray(0));
 
   return buffer;
 }
@@ -71,17 +73,17 @@ GLuint MeshGraphics::loadFloatBufferToShader(
     int perVertexCount,
     GLfloat* data)
 {
-  GL_CHECK(glBindVertexArray(meshData.data().vao));
+  GL__(glBindVertexArray(meshData.data().vao));
   GLuint buffer;
-  GL_CHECK(glGenBuffers(1, &buffer));
-  GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-  GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * lenItems, data, GL_STATIC_DRAW));
+  GL__(glGenBuffers(1, &buffer));
+  GL__(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+  GL__(glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * lenItems, data, GL_STATIC_DRAW));
 
   GLuint pos = meshData.shader().attribute(shaderParamName);
-  GL_CHECK(glEnableVertexAttribArray(pos));
-  GL_CHECK(glVertexAttribPointer(pos, perVertexCount, GL_FLOAT, GL_FALSE, 0, (void*) 0));
+  GL__(glEnableVertexAttribArray(pos));
+  GL__(glVertexAttribPointer(pos, perVertexCount, GL_FLOAT, GL_FALSE, 0, (void*) 0));
 
-  GL_CHECK(glBindVertexArray(0));
+  GL__(glBindVertexArray(0));
 
   return buffer;
 }

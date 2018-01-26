@@ -1,3 +1,4 @@
+# Define which projects to build
 option(BUILD_PERSP_TRIANGLE
   "Build perspective triangle example (persp-triangle)"
   ON)
@@ -14,6 +15,7 @@ option(BUILD_FREETYPE_101
   "Build freetype-gl 101 example (freetype-101)"
   ON)
 
+############################################################
 # GLFW
 if (
   BUILD_PERSP_TRIANGLE OR

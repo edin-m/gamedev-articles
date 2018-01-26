@@ -10,6 +10,7 @@ uniform mat4 projection;
 attribute vec3 vertex;
 attribute vec2 tex_coord;
 attribute vec4 color;
+
 void main()
 {
     gl_TexCoord[0].xy = tex_coord.xy;

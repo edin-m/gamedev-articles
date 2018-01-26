@@ -110,7 +110,7 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   k::Shader shader;
-  shader.loadShader("shader3");
+  shader.loadShader("../data/shaders/shader3");
   shader.use();
 
   glEnableVertexAttribArray(0);
@@ -128,10 +128,10 @@ int main() {
 
     glBindVertexArray(vao);
     shader.use();
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_cube_elements);
-//    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_cube_elements);
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
     // or
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+//    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers( window );
     glfwPollEvents();
