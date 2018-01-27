@@ -25,6 +25,10 @@ if (APPLE)
   add_definitions(-DAPPLE)
 endif()
 
+if (WIN32)
+  ADD_DEFINITIONS( -DWIN32_LEAN_AND_MEAN )
+endif()
+
 #option(BUILD_IOS "Build iOS projects" OFF)
 
 set(USE_GLEW ON)
@@ -39,6 +43,16 @@ option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
 option(USE_FREETYPE_GL "Use freetype gl" ON)
 
 include(Projects.cmake)
+
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+    MESSAGE( "DevIL, 64 bit compiler detected" )
+    SET( EX_PLATFORM 64 )
+    SET( EX_PLATFORM_NAME "x64" )
+else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+    MESSAGE( "DevIL, 32 bit compiler detected" )
+    SET( EX_PLATFORM 32 )
+    SET( EX_PLATFORM_NAME "x86" )
+endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
 # default to release
 if (NOT CMAKE_BUILD_TYPE)
@@ -134,6 +148,20 @@ if (NOT WIN32 AND USE_DEVIL)
   include_directories(${GIT_ROOT}/lib/DevIL/DevIL/include)
 endif()
 
+if (USE_DEVIL)
+  # set libraries to find DevIL
+  set(IL_FOUND ON CACHE BOOL "" FORCE)
+  set(IL_INCLUDE_DIR ${GIT_ROOT}/lib/DevIL/DevIL/include CACHE BOOL "" FORCE)
+  if (MSVC)
+    get_target_property(DEVIL_OUTPUT_NAME IL OUTPUT_NAME)
+  endif()
+
+  set(IL_LIBRARIES   ${CMAKE_CURRENT_BINARY_DIR}/lib/DevIL/DevIL/lib/${EX_PLATFORM_NAME}/libIL.a CACHE BOOL "" FORCE)
+#  message("IL_LIBRARIES ${IL_LIBRARIES}")
+  set(ILU_LIBRARIES  ${GIT_ROOT}/bin CACHE BOOL "" FORCE)
+  set(ILUT_LIBRARIES ${GIT_ROOT}/bin CACHE BOOL "" FORCE)
+endif()
+
 # DevIL has many dependencies, like libpng libjpeg, etc... not available on win by default
 # so download precompiled binaries
 if (WIN32 AND USE_DEVIL)
@@ -164,13 +192,20 @@ endif()
 
 # assimp
 if (USE_ASSIMP)
-  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+  list(APPEND CMAKE_PREFIX_PATH /Users/edin-m/Qt/5.8/clang_64/lib/cmake)
+
   set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+  set(ASSIMP_NO_EXPORT OFF CACHE BOOL "" FORCE)
   set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
   add_subdirectory(${EXT_LIB_DIR}/assimp)
-  if (assimp_FOUND)
-    set(EXT_LIBS ${EXT_LIBS} ${assimp_LIBRARIES})
-  endif()
+  set(EXT_LIBS ${EXT_LIBS} assimp)
+  message("CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")
+  include_directories(
+    ${EXT_LIB_DIR}/assimp/include
+    ${CMAKE_CURRENT_BINARY_DIR}/lib/assimp/include
+  )
 endif()
 
 ## OpenEXR - unused
@@ -181,6 +216,7 @@ endif()
 #  add_subdirectory(${EXT_LIB_DIR}/openexr/OpenEXR)
 #endif()
 
+# logging
 if (USE_EASYLOGGINGPP)
   # EASY_LOGGER is switched on by defualt
   set(build_static_lib ON CACHE BOOL "" FORCE)
@@ -191,6 +227,7 @@ if (USE_EASYLOGGINGPP)
   add_definitions(-DLIB_EASYLOGGING)
 endif()
 
+# freetype-gl
 if (USE_FREETYPE_GL)
   set(freetype-gl_WITH_GLEW ON CACHE BOOL "" FORCE)
   set(freetype-gl_USE_VAO ON CACHE BOOL "" FORCE)
@@ -211,6 +248,9 @@ if (USE_FREETYPE_GL)
     endif()
   endif()
 endif()
+
+# argument parser
+include_directories(${EXT_LIB_DIR}/argh)
 
 ## GLFM - ios/andriod glfw
 #if (BUILD_IOS OR BUILD_ANDROID)

@@ -1,4 +1,4 @@
-set(PROJ_NAME texture-101)
+set(PROJ_NAME assimp-101)
 set(SOURCES main.cpp)
 
 add_executable(${PROJ_NAME} ${SOURCES})
@@ -15,4 +15,5 @@ add_custom_command(TARGET ${PROJ_NAME}
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${SHADERS_SRC} ${SHADERS_DST}
   COMMAND ${CMAKE_COMMAND} -E make_directory ${EXECUTABLE_OUTPUT_PATH}/data/images
   COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DATA_DIR}/images/texture.png ${EXECUTABLE_OUTPUT_PATH}/data/images/texture.png
+  COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DATA_DIR}/objects/suzanne.obj ${EXECUTABLE_OUTPUT_PATH}/data/objects/suzanne.obj
 )

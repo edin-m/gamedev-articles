@@ -66,6 +66,28 @@ GLuint MeshGraphics::loadVec4ToShader(
   return buffer;
 }
 
+GLuint MeshGraphics::loadVec3ToShader(
+    MeshData& meshData,
+    const std::string& shaderParamName,
+    std::vector<glm::vec3>& data,
+    GLint drawType
+) {
+  GL__(glBindVertexArray(meshData.data().vao));
+  GLuint buffer;
+  GL__(glGenBuffers(1, &buffer));
+  GL__(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+  GL__(glBufferData(GL_ARRAY_BUFFER, sizeof(data[0]) * data.size(), &data[0], drawType));
+
+  GLuint pos = meshData.shader().attribute(shaderParamName);
+  GL__(glEnableVertexAttribArray(pos));
+  GL__(glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0));
+  GL__(glDisableVertexAttribArray(pos));
+
+  GL__(glBindVertexArray(0));
+
+  return buffer;
+}
+
 GLuint MeshGraphics::loadFloatBufferToShader(
     MeshData& meshData,
     const std::string& shaderParamName,

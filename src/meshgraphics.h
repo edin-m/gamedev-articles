@@ -25,6 +25,12 @@ public:
       std::vector<glm::vec4>& data,
       GLint drawType = GL_STATIC_DRAW
   );
+  GLuint loadVec3ToShader(
+      MeshData& meshData,
+      const std::string& shaderParamName,
+      std::vector<glm::vec3>& data,
+      GLint drawType = GL_STATIC_DRAW
+  );
   GLuint loadFloatBufferToShader(
       MeshData& meshData,
       const std::string& shaderParamName,

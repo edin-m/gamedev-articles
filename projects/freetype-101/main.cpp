@@ -83,10 +83,10 @@ void init(void) {
   size_t i, missed = 0;
 
   texture_font_t* font15 = 0;
-  atlas = texture_atlas_new( 512, 512, 1 );
+  atlas = texture_atlas_new(512, 512, 1);
   const char * text = "A Quick Brown Fox Jumps Over The Lazy Dog 0123456789";
   buffer = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
-  vec2 pen = {{5,850}};
+  vec2 pen = {{5,800}};
   vec4 black = {{0,0,0,1}};
   for (i = minsize; i < maxsize; ++i) {
     texture_font_t* font = texture_font_new_from_file(atlas, i, filename);

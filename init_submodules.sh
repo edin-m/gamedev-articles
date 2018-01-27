@@ -35,3 +35,11 @@ cd ../..
 cd lib/freetype-gl
 git checkout 507cc68511465981d32257268fee184b79cc69f7
 cd ../..
+
+cd lib/assimp
+git checkout v4.1.0
+cd ../..
+
+cd lib/argh
+git checkout v1.2.0
+cd ../..
