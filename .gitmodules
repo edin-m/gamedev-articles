@@ -18,10 +18,6 @@
 	path = lib/soil
 	url = https://github.com/kbranigan/Simple-OpenGL-Image-Library
     branch = 4fff135429c4c7996791c019e6cc20a1e9fde568
-[submodule "lib/assimp"]
-	path = lib/assimp
-	url = https://github.com/assimp/assimp.git
-    branch = 80799bdbf90ce626475635815ee18537718a05b1
 [submodule "lib/openexr"]
 	path = lib/openexr
 	url = https://github.com/openexr/openexr.git
