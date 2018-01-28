@@ -1,5 +1,5 @@
 git submodule update --init
-cd lib/glew
+cd lib/glew-2.1.0
 git checkout 3a8eff77da3658c13fbd3634c943d5251d76322c
 cd ../..
 

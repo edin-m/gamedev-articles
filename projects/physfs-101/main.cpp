@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
   printf( "OpenGL version supported %s\n", version );
 
   PHYSFS_init(nullptr);
-  int res = PHYSFS_mount("data/physfs-101.zip", nullptr, 1);
+  int res = PHYSFS_mount("data/physfs-101-data.zip", nullptr, 1);
   LOG(INFO) << "Success: " << (res > 0);
 
   bool exists = PHYSFS_exists("/images/texture.png");
@@ -216,10 +216,10 @@ int main(int argc, char** argv) {
 
   if (rebind_il) {
     LOG(INFO) << "Using PhysFS-overriden methods so IL can load directly from PhysFS";
-    ilSetRead(phys_IL_open, phys_IL_close,
-              phys_IL_eof, phys_IL_getc,
-              phys_IL_read, phys_IL_seek,
-              phys_IL_tell);
+    ilSetRead((fOpenRProc) &phys_IL_open, (fCloseRProc) &phys_IL_close,
+              (fEofProc) &phys_IL_eof, (fGetcProc) &phys_IL_getc,
+              (fReadProc) &phys_IL_read, (fSeekRProc) &phys_IL_seek,
+              (fTellRProc) &phys_IL_tell);
     texture = textureLoader.loadTexture("/images/texture.png");
     ilResetRead();
   }
