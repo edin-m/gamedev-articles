@@ -27,6 +27,7 @@ class TextureLoader
 public:
   TextureLoader();
   GLTexture loadTexture(const std::string& filename);
+  GLTexture loadILTexture(int image);
   void cleanup(GLTexture& glTexture);
 };
 

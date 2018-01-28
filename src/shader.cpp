@@ -11,6 +11,15 @@ Shader::Shader()
 
 }
 
+Shader::Shader(const Shader& shader)
+  : program(shader.program),
+    name(shader.name),
+    attributes(shader.attributes),
+    uniforms(shader.uniforms)
+{
+
+}
+
 Shader::~Shader() {
   deleteShader();
 }
@@ -52,6 +61,18 @@ GLuint Shader::loadShader(const std::string& path) {
     //        klog.e("shader") << "Shader program creation failed!";
   }
 
+  return program;
+}
+
+GLuint Shader::loadShader(const std::string& vertex, const std::string& fragment) {
+  GLuint fragid = uploadShader(GL_FRAGMENT_SHADER, fragment.c_str());
+  GLuint vertid = uploadShader(GL_VERTEX_SHADER, vertex.c_str());
+
+  std::vector<GLuint> shaders;
+  shaders.push_back(fragid);
+  shaders.push_back(vertid);
+
+  program = createProgram(shaders);
   return program;
 }
 

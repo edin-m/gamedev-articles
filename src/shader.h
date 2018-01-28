@@ -28,9 +28,11 @@ class Shader
     GLint addUniform(const std::string& unifrm);
 public:
     Shader();
+    Shader(const Shader& shader);
     ~Shader();
 
     GLuint loadShader(const std::string& name);
+    GLuint loadShader(const std::string& vertex, const std::string& fragment);
     bool deleteShader();
 
     void use();
@@ -40,7 +42,6 @@ public:
 
     GLint attribute(const std::string& attr);
     GLint uniform(const std::string& unifrm);
-
 };
 
 }

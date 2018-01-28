@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
     use_indices = true;
   }
 
-  if (cmdl["--no--use-indices"]) {
+  if (cmdl["--no-use-indices"]) {
     use_indices = false;
   }
 

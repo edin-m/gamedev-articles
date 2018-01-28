@@ -34,13 +34,14 @@ endif()
 set(USE_GLEW ON)
 
 option(USE_GLFW "Use GLFW" ON)
-option(USE_DEVIL "Use DevIL" ON)
+option(USE_DEVIL "Use DevIL" OFF)
 option(USE_GLUT "Use GLUT" OFF)
 option(USE_SOIL "Use SOIL" OFF)
 option(USE_ASSIMP "Use assimp" OFF)
 option(USE_OPENEXR "Use OpenEXR" OFF)
 option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
-option(USE_FREETYPE_GL "Use freetype gl" ON)
+option(USE_FREETYPE_GL "Use freetype gl" OFF)
+option(USE_PHYSFS "Use PhysFS" OFF)
 
 include(Projects.cmake)
 
@@ -202,10 +203,8 @@ if (USE_ASSIMP)
   add_subdirectory(${EXT_LIB_DIR}/assimp)
   set(EXT_LIBS ${EXT_LIBS} assimp)
   message("CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")
-  include_directories(
-    ${EXT_LIB_DIR}/assimp/include
-    ${CMAKE_CURRENT_BINARY_DIR}/lib/assimp/include
-  )
+  include_directories(${EXT_LIB_DIR}/assimp/include)
+  include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/assimp/include)
 endif()
 
 ## OpenEXR - unused
@@ -251,6 +250,33 @@ endif()
 
 # argument parser
 include_directories(${EXT_LIB_DIR}/argh)
+
+# PhysFS
+if (USE_PHYSFS)
+  # download - PhysFS is on Mercurial SCM
+  if (NOT EXISTS ${GIT_ROOT}/lib_bin/physfs-3.0.1.tar.bz2)
+    execute_process(
+        COMMAND wget --no-check-certificate -P ${GIT_ROOT}/lib_bin https://icculus.org/physfs/downloads/physfs-3.0.1.tar.bz2
+    )
+  endif()
+  # unpack
+  if (NOT EXISTS ${GIT_ROOT}/lib/physfs-3.0.1)
+    execute_process(
+      COMMAND bash "-c" "bzip2 -d -c ${GIT_ROOT}/lib_bin/physfs-3.0.1.tar.bz2 | tar -xf - -C ${GIT_ROOT}/lib"
+    )
+  endif()
+  # rename uninstall target because of name collision
+  execute_process(
+    COMMAND bash "-c" "sed -i -e 's/        uninstall$/        uninstall-physfs/g' ${EXT_LIB_DIR}/physfs-3.0.1/CMakeLists.txt"
+  )
+  set(PHYSFS_BUILD_STATIC TRUE CACHE BOOL "" FORCE)
+  set(PHYSFS_BUILD_TEST FALSE CACHE BOOL "" FORCE)
+  set(PHYSFS_BUILD_SHARED FALSE CACHE BOOL "" FORCE)
+  add_subdirectory(${EXT_LIB_DIR}/physfs-3.0.1)
+  include_directories(${EXT_LIB_DIR}/physfs-3.0.1/src)
+  get_target_property(PHYSFS_OUTPUT_NAME physfs-static OUTPUT_NAME)
+  set(EXT_LIBS ${EXT_LIBS} physfs-static)
+endif()
 
 ## GLFM - ios/andriod glfw
 #if (BUILD_IOS OR BUILD_ANDROID)
