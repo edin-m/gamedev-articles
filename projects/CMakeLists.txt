@@ -24,6 +24,10 @@ if (BUILD_PHYSFS_101)
   add_subdirectory(physfs-101)
 endif()
 
+if (BUILD_PHYSFS_102)
+  add_subdirectory(physfs-102)
+endif()
+
 #set(DESKTOP_PROJECTS
 #      persp-triangle
 #      texture-101

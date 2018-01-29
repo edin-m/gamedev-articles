@@ -23,20 +23,21 @@ option(BUILD_PHYSFS_101
   "Build PhysFS 101 example (physfs-101)"
   OFF)
 
+option(BUILD_PHYSFS_102
+  "Build PhysFS 102 example (physfs-102)"
+  OFF)
+
 ############################################################
 # separate ORs with two spaces so it's more readable
 ############################################################
-# GLFW
-if (
-  BUILD_PERSP_TRIANGLE  OR  BUILD_TEXTURE_101  OR  BUILD_BVH_LOADER  OR
-  BUILD_FREETYPE_101  OR  BUILD_ASSIMP_101  OR  BUILD_PHYSFS_101
-)
-  set(USE_GLFW ON CACHE BOOL "" FORCE)
-endif()
+
+# GLFW - by default: on
+set(USE_GLFW ON CACHE BOOL "" FORCE)
 
 # DevIL
 if (
-  BUILD_TEXTURE_101  OR  BUILD_ASSIMP_101  OR  BUILD_PHYSFS_101
+  BUILD_TEXTURE_101  OR  BUILD_ASSIMP_101  OR  BUILD_PHYSFS_101 OR
+  BUILD_PHYSFS_102
 )
   set(USE_DEVIL ON CACHE BOOL "" FORCE)
 endif()
@@ -50,14 +51,14 @@ endif()
 
 # assimp
 if (
-    BUILD_ASSIMP_101
+    BUILD_ASSIMP_101  OR  BUILD_PHYSFS_102
 )
   set(USE_ASSIMP ON CACHE BOOL "" FORCE)
 endif()
 
 # PhysFS
 if (
-    BUILD_PHYSFS_101
+    BUILD_PHYSFS_101  OR  BUILD_PHYSFS_102
 )
   set(USE_PHYSFS ON CACHE BOOL "" FORCE)
 endif()
@@ -65,8 +66,8 @@ endif()
 ######
 
 # set zlib
-if (
-    USE_ASSIMP
-)
-  set(USE_ZLIB ON CACHE BOOL "" FORCE)
-endif()
+#if (
+#    USE_ASSIMP
+#)
+#  set(USE_ZLIB ON CACHE BOOL "" FORCE)
+#endif()
