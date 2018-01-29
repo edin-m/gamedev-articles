@@ -34,7 +34,7 @@ endif()
 set(USE_GLEW ON)
 
 option(USE_GLFW "Use GLFW" ON)
-option(USE_DEVIL "Use DevIL" ON)
+option(USE_DEVIL "Use DevIL" OFF)
 option(USE_GLUT "Use GLUT" OFF)
 option(USE_SOIL "Use SOIL" OFF)
 option(USE_ASSIMP "Use assimp" OFF)
@@ -43,6 +43,10 @@ option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
 option(USE_FREETYPE_GL "Use freetype gl" OFF)
 option(USE_PHYSFS "Use PhysFS" OFF)
 
+# use only if needed in subprojects
+set(USE_ZLIB OFF)
+
+# load projects - this will adapt USE_* variables for whichever dependency is needed
 include(Projects.cmake)
 
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
@@ -61,7 +65,22 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
 endif()
 
+# static libs as much as possible
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+# zlib if not present include
+if (USE_ZLIB)
+#  add_subdirectory(${EXT_LIB_DIR}/zlib)
+#  set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
+#  set(ZLIB_ROOT ${EXT_LIB_DIR}/zlib CACHE BOOL "" FORCE)
+#  set(ZLIB_INCLUDE_DIR ${EXT_LIB_DIR}/zlib CACHE BOOL "" FORCE)
+#  if (NOT WIN32)
+#    set(EXT_LIBS ${EXT_LIBS} zlibstatic)
+#  else()
+#    set(EXT_LIBS ${EXT_LIBS} zlib1)
+#  endif()
+#  link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/zlib)
+endif()
 
 # GLFW
 if (USE_GLFW)
@@ -200,6 +219,10 @@ if (USE_ASSIMP)
   set(ASSIMP_NO_EXPORT OFF CACHE BOOL "" FORCE)
   set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+  set(ASSIMP_BUILD_ZLIB OFF CACHE BOOL "" FORCE)
+  if (WIN32)
+    set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
+  endif()
   add_subdirectory(${EXT_LIB_DIR}/assimp)
   set(EXT_LIBS ${EXT_LIBS} assimp)
   message("CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")

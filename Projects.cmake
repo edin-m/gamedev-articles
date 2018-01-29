@@ -61,3 +61,12 @@ if (
 )
   set(USE_PHYSFS ON CACHE BOOL "" FORCE)
 endif()
+
+######
+
+# set zlib
+if (
+    USE_ASSIMP
+)
+  set(USE_ZLIB ON CACHE BOOL "" FORCE)
+endif()
