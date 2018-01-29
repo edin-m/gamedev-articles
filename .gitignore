@@ -39,4 +39,6 @@ bin
 lib/glew*
 lib_bin/*.zip
 lib/DevIL Windows SDK/
+lib/physfs-3.0.1/
+lib_bin/*
 

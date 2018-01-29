@@ -42,3 +42,7 @@
 	path = lib/argh
 	url = https://github.com/adishavit/argh.git
     branch = 5768268e2f072e3d13022cbacd89f47e33efa0dc
+[submodule "lib/zlib"]
+	path = lib/zlib
+	url = https://github.com/madler/zlib.git
+    branch = cacf7f1d4e3d44d871b605da3b647f07d718623f

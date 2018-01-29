@@ -43,3 +43,8 @@ cd ../..
 cd lib/argh
 git checkout v1.2.0
 cd ../..
+
+cd lib/zlib
+git checkout v1.2.11
+cd ../..
+
