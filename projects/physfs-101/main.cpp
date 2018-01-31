@@ -32,15 +32,15 @@ INITIALIZE_EASYLOGGINGPP
 
 #define BUFFER_OFFSET(offset) ((void *)(offset))
 
-void phys_IL_close(ILHANDLE handle) {
+void ILAPIENTRY phys_IL_close(ILHANDLE handle) {
   PHYSFS_close((PHYSFS_File*) handle);
 }
 
-ILboolean phys_IL_eof(ILHANDLE handle) {
+ILboolean ILAPIENTRY phys_IL_eof(ILHANDLE handle) {
   return PHYSFS_eof((PHYSFS_File*) handle) == 0 ? IL_FALSE : IL_TRUE;
 }
 
-ILint phys_IL_getc(ILHANDLE handle) {
+ILint ILAPIENTRY phys_IL_getc(ILHANDLE handle) {
   char c;
   int x = PHYSFS_readBytes((PHYSFS_File*) handle, &c, 1);
   if (x < 1) {
@@ -49,17 +49,17 @@ ILint phys_IL_getc(ILHANDLE handle) {
   return c;
 }
 
-ILHANDLE phys_IL_open(ILconst_string file) {
+ILHANDLE ILAPIENTRY phys_IL_open(ILconst_string file) {
   PHYSFS_File* fp;
   fp = PHYSFS_openRead(file);
   return (ILHANDLE) fp;
 }
 
-ILint phys_IL_read(void* Buffer, ILuint Size, ILuint Number, ILHANDLE Handle) {
+ILint ILAPIENTRY phys_IL_read(void* Buffer, ILuint Size, ILuint Number, ILHANDLE Handle) {
   return ILint(PHYSFS_readBytes((PHYSFS_File*) Handle, Buffer, Size * Number));
 }
 
-ILint phys_IL_seek(ILHANDLE Handle, ILint Offset, ILint Mode) {
+ILint ILAPIENTRY phys_IL_seek(ILHANDLE Handle, ILint Offset, ILint Mode) {
   if (Mode == IL_SEEK_END) {
     PHYSFS_sint64 size = PHYSFS_fileLength((PHYSFS_File*) Handle);
     return (ILint) PHYSFS_seek((PHYSFS_File*) Handle, (PHYSFS_uint64) size);
@@ -72,7 +72,7 @@ ILint phys_IL_seek(ILHANDLE Handle, ILint Offset, ILint Mode) {
   return -1;
 }
 
-ILint phys_IL_tell(ILHANDLE handle) {
+ILint ILAPIENTRY phys_IL_tell(ILHANDLE handle) {
   return (ILint) PHYSFS_tell((PHYSFS_File*) handle);
 }
 
