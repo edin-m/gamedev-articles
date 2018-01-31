@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 project(gamedev-articles)
 
@@ -42,6 +42,7 @@ option(USE_OPENEXR "Use OpenEXR" OFF)
 option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
 option(USE_FREETYPE_GL "Use freetype gl" OFF)
 option(USE_PHYSFS "Use PhysFS" OFF)
+option(USE_AUDIO_ALURE "Use OpenAL alure" OFF)
 
 # use only if needed in subprojects
 set(USE_ZLIB OFF)
@@ -84,6 +85,7 @@ endif()
 
 # GLFW
 if (USE_GLFW)
+  set(GLFW_USE_HYBRID_HPG ON CACHE BOOL "" FORCE)
   find_package(OpenGL REQUIRED)
   if (OPENGL_FOUND)
     include_directories(${OPENGL_INCLUDE_DIR})
@@ -288,7 +290,7 @@ if (USE_PHYSFS)
       COMMAND bash "-c" "bzip2 -d -c ${GIT_ROOT}/lib_bin/physfs-3.0.1.tar.bz2 | tar -xf - -C ${GIT_ROOT}/lib"
     )
   endif()
-  # rename uninstall target because of name collision
+  # rename uninstall target because of a name collision
   execute_process(
     COMMAND bash "-c" "sed -i -e 's/        uninstall$/        uninstall-physfs/g' ${EXT_LIB_DIR}/physfs-3.0.1/CMakeLists.txt"
   )
@@ -299,6 +301,33 @@ if (USE_PHYSFS)
   include_directories(${EXT_LIB_DIR}/physfs-3.0.1/src)
   get_target_property(PHYSFS_OUTPUT_NAME physfs-static OUTPUT_NAME)
   set(EXT_LIBS ${EXT_LIBS} physfs-static)
+endif()
+
+# alure OpenAL
+if (USE_AUDIO_ALURE)
+  set(OGG_ROOT ${EXT_LIB_DIR}/ogg)
+  add_subdirectory(${OGG_ROOT})
+
+  set(OGG_INCLUDE_DIRS ${OGG_ROOT}/include)
+  include_directories(${OGG_INCLUDE_DIRS})
+  link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/ogg)
+  set(OGG_LIBRARIES ogg)
+  add_subdirectory(${EXT_LIB_DIR}/vorbis)
+
+  set(OGG_INCLUDE_DIR ${OGG_INCLUDE_DIRS})
+  set(OGG_LIBRARY ${OGG_LIBRARIES})
+  set(VORBIS_INCLUDE_DIR ${EXT_LIB_DIR}/vorbis/include)
+  link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/vorbis)
+  set(VORBIS_LIBRARY vorbis)
+  set(VORBISFILE_LIBRARY vorbisfile)
+  # don't build examples
+  set(ALURE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+  set(ALURE_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+  set(ALURE_BUILD_STATIC ON CACHE BOOL "" FORCE)
+  set(ALURE_INSTALL_TARGETS OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${EXT_LIB_DIR}/alure)
+
+  set(EXT_LIBS ${EXT_LIBS} ogg vorbis alure2_s)
 endif()
 
 ## GLFM - ios/andriod glfw

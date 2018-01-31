@@ -27,6 +27,10 @@ option(BUILD_PHYSFS_102
   "Build PhysFS 102 example (physfs-102)"
   OFF)
 
+option(BUILD_ALURE_101
+  "Build alure 101 example (alure-101)"
+  OFF)
+
 ############################################################
 # separate ORs with two spaces so it's more readable
 ############################################################
@@ -61,6 +65,13 @@ if (
     BUILD_PHYSFS_101  OR  BUILD_PHYSFS_102
 )
   set(USE_PHYSFS ON CACHE BOOL "" FORCE)
+endif()
+
+# alure
+if (
+    BUILD_ALURE_101
+)
+  set(USE_AUDIO_ALURE ON CACHE BOOL "" FORCE)
 endif()
 
 ######

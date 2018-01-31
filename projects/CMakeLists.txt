@@ -1,5 +1,4 @@
-
-## Basic projects
+# Basic projects
 if (BUILD_PERSP_TRIANGLE)
   add_subdirectory(persp-triangle)
 endif()
@@ -28,12 +27,7 @@ if (BUILD_PHYSFS_102)
   add_subdirectory(physfs-102)
 endif()
 
-#set(DESKTOP_PROJECTS
-#      persp-triangle
-#      texture-101
-#      bvh-loader)
+if (BUILD_ALURE_101)
+  add_subdirectory(alure-101)
+endif()
 
-#foreach (proj ${DESKTOP_PROJECTS})
-#  message("Adding project: ${proj}")
-#  add_subdirectory(${proj})
-#endforeach (proj)

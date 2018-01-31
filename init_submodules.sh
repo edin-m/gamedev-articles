@@ -48,3 +48,14 @@ cd lib/zlib
 git checkout v1.2.11
 cd ../..
 
+cd lib/alure
+git checkout 82436dd3eb834635140a9e8d3224376ae2d6fbf5
+cd ../..
+
+cd lib/vorbis
+git checkout v1.3.5
+cd ../..
+
+cd lib/ogg
+git checkout v1.3.3
+cd ../..

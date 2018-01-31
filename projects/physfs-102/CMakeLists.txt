@@ -16,8 +16,6 @@ set(SHADERS_DST
 
 set(ARCHIVE_NAME ${PROJ_NAME}-data.zip)
 
-#message("cd \"${PHYSFS_101_DATA}\" && \"${CMAKE_COMMAND}\" -E tar -cvf ${ARCHIVE_NAME} images shaders --format=zip && mv ${ARCHIVE_NAME} ..")
-
 if (MSVC OR WIN32)
   execute_process(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DST}
@@ -40,7 +38,7 @@ else ()
      COMMAND ${CMAKE_COMMAND} -E make_directory ${PYSFS_102_DATA}/objects
      COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DATA_DIR}/images/texture.png ${PYSFS_102_DATA}/images/texture.png
      COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DATA_DIR}/objects/suzanne.obj ${PYSFS_102_DATA}/objects/suzanne.obj
-#     COMMAND ${CMAKE_COMMAND} -E chdir ${PYSFS_102_DATA} tar "cfv" ${EXECUTABLE_OUTPUT_PATH}/data/${ARCHIVE_NAME} --format=zip images shaders
-#    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PYSFS_102_DATA}
+     COMMAND ${CMAKE_COMMAND} -E chdir ${PYSFS_102_DATA} tar "cfv" ${EXECUTABLE_OUTPUT_PATH}/data/${ARCHIVE_NAME} --format=zip images shaders objects
+     COMMAND ${CMAKE_COMMAND} -E remove_directory ${PYSFS_102_DATA}
    )
 endif ()

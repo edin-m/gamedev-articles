@@ -46,3 +46,14 @@
 	path = lib/zlib
 	url = https://github.com/madler/zlib.git
     branch = cacf7f1d4e3d44d871b605da3b647f07d718623f
+[submodule "lib/alure"]
+	path = lib/alure
+	url = https://github.com/edin-m/alure.git
+    branch = e7c3fb1c53b0f94e9e229ed94f4bf3e6a29ce7a0
+[submodule "lib/vorbis"]
+	path = lib/vorbis
+	url = https://github.com/xiph/vorbis
+    branch = f4093202cb226b360d0edf8a948aa71142cec657
+[submodule "lib/ogg"]
+	path = lib/ogg
+	url = https://github.com/xiph/ogg

@@ -33,8 +33,6 @@ INITIALIZE_EASYLOGGINGPP
 
 #include "IL/il.h"
 
-using namespace physfs_devil;
-
 using namespace std;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
