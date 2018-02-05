@@ -57,3 +57,8 @@
 [submodule "lib/ogg"]
 	path = lib/ogg
 	url = https://github.com/xiph/ogg
+    branch = 4380566a44b8d5e85ad511c9c17eb04197863ec5
+[submodule "lib/eigen"]
+	path = lib/eigen
+	url = https://github.com/eigenteam/eigen-git-mirror.git
+    branch = dde02fceedfc1ba09d4d4f71a2b5dafcfcb85491

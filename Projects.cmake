@@ -1,3 +1,5 @@
+option(BUILD_ALL_DESKTOP_PROJECTS "Build all desktop projects - takes a long time" OFF)
+
 # Define which projects to build
 option(BUILD_PERSP_TRIANGLE
   "Build perspective triangle example (persp-triangle)"
@@ -31,9 +33,25 @@ option(BUILD_ALURE_101
   "Build alure 101 example (alure-101)"
   OFF)
 
+option(BUILD_EIGEN_101
+  "Build eigen 101 example (eigen-101)"
+  OFF)
+
 ############################################################
 # separate ORs with two spaces so it's more readable
 ############################################################
+
+if (BUILD_ALL_DESKTOP_PROJECTS)
+  set(BUILD_PERSP_TRIANGLE ON)
+  set(BUILD_TEXTURE_101 ON)
+  set(BUILD_BVH_LOADER ON)
+  set(BUILD_FREETYPE_101 ON)
+  set(BUILD_ASSIMP_101 ON)
+  set(BUILD_PHYSFS_101 ON)
+  set(BUILD_PHYSFS_102 ON)
+  set(BUILD_ALURE_101 ON)
+  set(BUILD_EIGEN_101 ON)
+endif()
 
 # GLFW - by default: on
 set(USE_GLFW ON CACHE BOOL "" FORCE)
@@ -72,6 +90,13 @@ if (
     BUILD_ALURE_101
 )
   set(USE_AUDIO_ALURE ON CACHE BOOL "" FORCE)
+endif()
+
+# eigen
+if (
+    BUILD_EIGEN_101
+)
+  set(USE_EIGEN ON CACHE BOOL "" FORCE)
 endif()
 
 ######

@@ -1,187 +1,184 @@
-#include <iostream>
-
-#include <functional>
-
-#include <memory>
+#include <stdio.h>
+#include <string.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "freetype-gl.h"
+#include "vertex-buffer.h"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "glm/gtc/matrix_inverse.hpp"
 
 #include "shader.h"
-
-#include "freetype-gl.h"
-#include "demos/mat4.h"
-#include "demos/shader.h"
-#include "vertex-buffer.h"
-#include "utf8-utils.h"
-//#include "demos/screenshot-util.h"
 
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
 
-#include "glcheck.h"
-
-k::Shader myshader;
-texture_atlas_t* atlas;
-vertex_buffer_t* buffer;
-mat4 model, view, projection;
-
+// ------------------------------------------------------- typedef & struct ---
 typedef struct {
     float x, y, z;
     float s, t;
     float r, g, b, a;
 } vertex_t;
 
-void add_text( vertex_buffer_t * buffer, texture_font_t * font,
-               const char * text, vec4 * color, vec2 * pen )
+// ------------------------------------------------------- global variables ---
+texture_atlas_t* atlas;
+vertex_buffer_t* buffer;
+k::Shader shader;
+glm::mat4 ortho;
+
+// --------------------------------------------------------------- add_text ---
+void add_text(vertex_buffer_t* buffer, texture_font_t* font,
+              char* text, vec4* color, vec2* pen)
 {
-    size_t i;
-    float r = color->red, g = color->green, b = color->blue, a = color->alpha;
-    for( i = 0; i < strlen(text); ++i )
-    {
-        texture_glyph_t *glyph = texture_font_get_glyph( font, text + i );
-        if( glyph != NULL )
-        {
-            float kerning =  0.0f;
-            if( i > 0)
-            {
-                kerning = texture_glyph_get_kerning( glyph, text + i - 1 );
-            }
-            pen->x += kerning;
-            float x0  = ( pen->x + glyph->offset_x );
-            float y0  = ( pen->y + glyph->offset_y );
-            float x1  = ( x0 + glyph->width );
-            float y1  = ( y0 - glyph->height );
-            float s0 = glyph->s0;
-            float t0 = glyph->t0;
-            float s1 = glyph->s1;
-            float t1 = glyph->t1;
-            GLuint indices[6] = {0,1,2, 0,2,3};
-            vertex_t vertices[4] = { { (float)x0,(float)y0,0,  s0,t0,  r,g,b,a },
-                                     { (float)x0,(float)y1,0,  s0,t1,  r,g,b,a },
-                                     { (float)x1,(float)y1,0,  s1,t1,  r,g,b,a },
-                                     { (float)x1,(float)y0,0,  s1,t0,  r,g,b,a } };
-            vertex_buffer_push_back( buffer, vertices, 4, indices, 6 );
-            pen->x += glyph->advance_x;
-        }
-    }
-}
+  size_t i;
+  float r = color->red, g = color->green, b = color->blue, a = color->alpha;
+  for (i = 0; i < strlen(text); ++i) {
+    texture_glyph_t *glyph = texture_font_get_glyph(font, text + i);
+    if (glyph != nullptr) {
+      float kerning =  0.0f;
+      if (i > 0) {
+        kerning = texture_glyph_get_kerning(glyph, text + i - 1);
+      }
+      pen->x += kerning;
+      int x0  = (int)(pen->x + glyph->offset_x);
+      int y0  = (int)(pen->y + glyph->offset_y);
+      int x1  = (int)(x0 + glyph->width);
+      int y1  = (int)(y0 - glyph->height);
 
-void init(void) {
-  atlas = texture_atlas_new(512, 512, 1);
-  const char* filename = "../data/fonts/Vera.ttf";
-  const char* cache = " !\"#$%&'()*+,-./0123456789:;<=>?"
-                       "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-                       "`abcdefghijklmnopqrstuvwxyz{|}~";
-  size_t minsize = 8, maxsize = 26;
-  size_t count = maxsize - minsize;
-  size_t i, missed = 0;
+      float xdiff = 0.0f;
+      float ydiff = 0.0f;
 
-  texture_font_t* font15 = 0;
-  atlas = texture_atlas_new(512, 512, 1);
-  const char * text = "A Quick Brown Fox Jumps Over The Lazy Dog 0123456789";
-  buffer = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
-  vec2 pen = {{5,800}};
-  vec4 black = {{0,0,0,1}};
-  for (i = minsize; i < maxsize; ++i) {
-    texture_font_t* font = texture_font_new_from_file(atlas, i, filename);
-    pen.x = 5;
-    pen.y -= font->height;
-    texture_font_load_glyphs(font, cache);
-    if (i == 15) {
-      font15 = font;
-    } else {
-      texture_font_delete(font);
+      xdiff = glyph->s1 - glyph->s0;
+      ydiff = glyph->t1 - glyph->t0;
+      xdiff = xdiff / 20.0f;
+      ydiff = ydiff / 25.0f;
+
+      float s0 = glyph->s0;
+      float t0 = glyph->t0;
+      float s1 = glyph->s1 - xdiff;
+      float t1 = glyph->t1 - ydiff;
+
+      GLuint indices[6] = { 0, 1, 2,  0, 2, 3 };
+      vertex_t vertices[4] = { { static_cast<float>(x0), static_cast<float>(y0), 0,  s0, t0,  r, g, b, a },
+                               { static_cast<float>(x0), static_cast<float>(y1), 0,  s0, t1,  r, g, b, a },
+                               { static_cast<float>(x1), static_cast<float>(y1), 0,  s1, t1,  r, g, b, a },
+                               { static_cast<float>(x1), static_cast<float>(y0), 0,  s1, t0,  r, g, b, a } };
+      vertex_buffer_push_back(buffer, vertices, 4, indices, 6);
+      pen->x += glyph->advance_x;
     }
   }
-  add_text(buffer, font15, text, &black, &pen);
-  texture_font_delete(font15);
-
-  glGenTextures(1, &atlas->id);
-  glBindTexture(GL_TEXTURE_2D, atlas->id);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlas->width, atlas->height,
-                0, GL_RED, GL_UNSIGNED_BYTE, atlas->data);
-
-  myshader.loadShader("data/freetype-101/shaders/v3f-t2f-c4f");
-  mat4_set_identity( &projection );
-  mat4_set_identity( &model );
-  mat4_set_identity( &view );
 }
 
-void display(GLFWwindow* window) {
-  glClearColor( 1, 1, 1, 1 );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+void cleanup() {
+  glDeleteTextures(1, &atlas->id);
+  atlas->id = 0;
+  texture_atlas_delete(atlas);
+}
 
-  glEnable( GL_BLEND );
-  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-    myshader.use();
-    {
-      GLint texLoc = myshader.uniform("texture");
-      GLint modelLoc = myshader.uniform("model");
-      GLint viewLoc = myshader.uniform("view");
-      GLint projLoc = myshader.uniform("projection");
-
-      glUniform1i(texLoc, 0);
-      glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.data);
-      glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.data);
-      glUniformMatrix4fv(projLoc, 1, GL_FALSE, projection.data);
-
-      vertex_buffer_render(buffer, GL_TRIANGLES);
+// ------------------------------------------------------------------- init ---
+void init()
+{
+    size_t i;
+    texture_font_t* font = 0;
+    atlas = texture_atlas_new(1024, 1024, 1);
+    const char* filename = "fonts/Vera.ttf";
+    char* text = "A quick brown fox jumps over      the  lazy  dog.";
+    buffer = vertex_buffer_new("vertex:3f,tex_coord:2f,color:4f");
+    vec2 pen = {{ 0, 1588 }};
+    vec4 black = {{ 0, 0, 0, 1 }};
+    for (i = 7; i < 40; ++i) {
+        font = texture_font_new_from_file(atlas, i, filename);
+        pen.x = 5;
+        pen.y -= font->height;
+        texture_font_load_glyphs(font, text);
+        add_text(buffer, font, text, &black, &pen);
+        texture_font_delete(font);
     }
-    myshader.unuse();
+
+    glGenTextures(1, &atlas->id);
+    glBindTexture(GL_TEXTURE_2D, atlas->id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, atlas->width, atlas->height,
+                 0, GL_RED, GL_UNSIGNED_BYTE, atlas->data);
+
+    shader.loadShader("data/freetype-101/shaders/freetype-101");
+}
+
+// ---------------------------------------------------------------- display ---
+void display(GLFWwindow* window)
+{
+    glClearColor(1, 1, 1, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    shader.use();
+    {
+        glUniform1i(shader.uniform("tex"), 0);
+        glUniformMatrix4fv(shader.uniform("mvp"), 1, 0, glm::value_ptr(ortho));
+        vertex_buffer_render(buffer, GL_TRIANGLES);
+    }
+    shader.unuse();
+
     glfwSwapBuffers(window);
 }
 
-void reshape(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-    mat4_set_orthographic(&projection, 0, width, 0, height, -1, 1);
+
+// ---------------------------------------------------------------- reshape ---
+void reshape(GLFWwindow* window, int width, int height)
+{
+  glViewport(0, 0, width, height);
+
+  LOG(INFO) << width << " " << height;
+  ortho = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
 }
 
-void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    }
+// --------------------------------------------------------------- keyboard ---
+void keyboard( GLFWwindow* window, int key, int scancode, int action, int mods )
+{
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+      glfwSetWindowShouldClose( window, GL_TRUE );
+  }
+  if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+      exit(0);
+  }
 }
 
-void error_callback(int error, const char* description) {
-    LOG(ERROR) << error << description;
+
+// --------------------------------------------------------- error-callback ---
+void error_callback( int error, const char* description )
+{
+    fputs( description, stderr );
 }
 
+// ------------------------------------------------------------------- main ---
 int main(int argc, char **argv)
 {
-    START_EASYLOGGINGPP(argc, argv);
     GLFWwindow* window;
-    char* screenshot_path = NULL;
-
-    if (argc > 1) {
-        if (argc == 3 && 0 == strcmp("--screenshot", argv[1])) {
-            screenshot_path = argv[2];
-        } else {
-            LOG(ERROR) << "Unknown or incomplete parameters given";
-            exit(EXIT_FAILURE);
-        }
-    }
 
     glfwSetErrorCallback(error_callback);
 
-    if (!glfwInit()) {
+    if (!glfwInit( )) {
         exit(EXIT_FAILURE);
     }
 
-    glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-    window = glfwCreateWindow(512, 512, argv[0], NULL, NULL);
+#if APPLE
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    window = glfwCreateWindow(1280, 720, argv[0], NULL, NULL);
 
     if (!window) {
         glfwTerminate();
@@ -198,32 +195,35 @@ int main(int argc, char **argv)
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
     if (GLEW_OK != err) {
-        /* Problem: glewInit failed, something is seriously wrong. */
-        LOG(ERROR) << "Error: " << glewGetErrorString(err);
+        LOG(ERROR) << "Error " << glewGetErrorString(err);
         exit(EXIT_FAILURE);
     }
     LOG(INFO) << "Using GLEW " << glewGetString(GLEW_VERSION);
 
+    const GLubyte* renderer;
+    const GLubyte* version;
+    int majorVersion;
+    int minorVersion;
+
+    renderer = glGetString(GL_RENDERER); /* get renderer string */
+    version = glGetString(GL_VERSION);	 /* version as a string */
+    glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);	 /* version as a string */
+    glGetIntegerv(GL_MINOR_VERSION, &minorVersion);	 /* version as a string */
+    printf("Renderer: %s\n", renderer);
+    printf("OpenGL version supported %s\n", version);
+    printf("OpenGL version supported %d.%d\n", majorVersion, minorVersion);
+
     init();
 
     glfwShowWindow(window);
-    reshape(window, 512, 512);
+    reshape(window, 1280, 720);
 
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         display(window);
         glfwPollEvents();
-
-//        if (screenshot_path)
-//        {
-//            screenshot(window, screenshot_path);
-//            glfwSetWindowShouldClose(window, 1);
-//        }
     }
 
-    glDeleteTextures(1, &atlas->id);
-    atlas->id = 0;
-    texture_atlas_delete(atlas);
+  cleanup();
 
     glfwDestroyWindow(window);
     glfwTerminate();

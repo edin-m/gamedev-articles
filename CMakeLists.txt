@@ -43,6 +43,7 @@ option(USE_EASYLOGGINGPP "Use easyloggingpp" ON)
 option(USE_FREETYPE_GL "Use freetype gl" OFF)
 option(USE_PHYSFS "Use PhysFS" OFF)
 option(USE_AUDIO_ALURE "Use OpenAL alure" OFF)
+option(USE_EIGEN "Use eigen" OFF)
 
 # use only if needed in subprojects
 set(USE_ZLIB OFF)
@@ -97,9 +98,17 @@ if (USE_GLFW)
   set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
   set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
   add_subdirectory(${EXT_LIB_DIR}/glfw)
   set(EXT_LIBS ${EXT_LIBS} glfw)
-  set(GLFW_INCLUDE_DIR ${EXT_LIB_DIR}/glfw/include)
+  set(GLFW3_INCLUDE_DIR ${EXT_LIB_DIR}/glfw/include)
+  set(GLFW3_LIBRARY glew3)
+  file(COPY
+    ${CMAKE_BINARY_DIR}/lib/glfw/CMakeFiles/Export/lib/cmake/glfw3/glfw3Targets.cmake
+    DESTINATION
+    ${CMAKE_BINARY_DIR}/lib/glfw/src)
+  set(glfw3_DIR ${CMAKE_BINARY_DIR}/lib/glfw/src)
+
 endif (USE_GLFW)
 
 if (APPLE AND (NOT USE_GLEW))
@@ -328,6 +337,19 @@ if (USE_AUDIO_ALURE)
   add_subdirectory(${EXT_LIB_DIR}/alure)
 
   set(EXT_LIBS ${EXT_LIBS} ogg vorbis alure2_s)
+endif()
+
+if (USE_EIGEN)
+  # rename uninstall target because of a name collision
+  execute_process(
+    COMMAND bash "-c" "sed -i -e 's/ uninstall$/ uninstall-eigen/g' ${EXT_LIB_DIR}/eigen/CMakeLists.txt"
+  )
+  set(EIGEN_BUILD_BTL OFF CACHE BOOL "" FORCE)
+  set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${EXT_LIB_DIR}/eigen)
+  include_directories(${EXT_LIB_DIR}/eigen)
+
+  set(EXT_LIBS ${EXT_LIBS} eigen)
 endif()
 
 ## GLFM - ios/andriod glfw

@@ -3,6 +3,7 @@ set(PROJ_NAME freetype-101)
 set(SOURCES
   ${EXT_LIB_DIR}/freetype-gl/demos/mat4.c
   ${EXT_LIB_DIR}/freetype-gl/demos/shader.c
+  ${EXT_LIB_DIR}/freetype-gl/demos/screenshot-util.c
   main.cpp
 )
 

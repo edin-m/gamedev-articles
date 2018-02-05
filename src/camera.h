@@ -27,12 +27,17 @@ class Camera
   }
 
 public:
+  Camera() { }
   Camera(int viewportWidth, int viewportHeight) {
+    setViewport(viewportWidth, viewportHeight);
+  }
+
+  void setViewport(int width, int height) {
     location = glm::vec3(1, 1, 3);
     lookat   = glm::vec3(0, 0, 0);
     upvec    = glm::vec3(0, 1, 0);
     fovy  = 45.0f;
-    m_aspect = (float) viewportWidth / (float) viewportHeight;
+    m_aspect = (float) width / (float) height;
 
     updateMatrices();
   }

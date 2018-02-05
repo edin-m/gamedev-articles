@@ -59,3 +59,7 @@ cd ../..
 cd lib/ogg
 git checkout v1.3.3
 cd ../..
+
+cd lib/eigen
+git checkout 3.3.4
+cd ../..

@@ -31,3 +31,7 @@ if (BUILD_ALURE_101)
   add_subdirectory(alure-101)
 endif()
 
+if (BUILD_EIGEN_101)
+  add_subdirectory(eigen-101)
+endif()
+

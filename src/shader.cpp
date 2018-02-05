@@ -4,6 +4,8 @@
 
 #include "glcheck.h"
 
+#include "easylogging++.h"
+
 namespace k {
 
 Shader::Shader()
@@ -49,6 +51,7 @@ GLuint Shader::loadShader(const std::string& path) {
     return 0;
   }
 
+
   std::vector<GLuint> shaders;
   shaders.push_back(fragid);
   shaders.push_back(vertid);
@@ -56,8 +59,12 @@ GLuint Shader::loadShader(const std::string& path) {
   program = createProgram(shaders);
 
   if( program > 0 ) {
+    std::cout << "Shader program successfully created." << std::endl;
+//    LOG(INFO) << "Shader program successfully created.";
     //        klog.i("shader") << "Shader program successfully created.";
   } else {
+    std::cout << "Shader program creation failed!" << std::endl;
+//    LOG(INFO) << "Shader program creation failed!";
     //        klog.e("shader") << "Shader program creation failed!";
   }
 
