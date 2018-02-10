@@ -84,10 +84,10 @@ void init()
     size_t i;
     texture_font_t* font = 0;
     atlas = texture_atlas_new(1024, 1024, 1);
-    const char* filename = "fonts/Vera.ttf";
+    const char* filename = "data/freetype-101/fonts/Vera.ttf";
     char* text = "A quick brown fox jumps over      the  lazy  dog.";
     buffer = vertex_buffer_new("vertex:3f,tex_coord:2f,color:4f");
-    vec2 pen = {{ 0, 1588 }};
+    vec2 pen = {{ 0, 900 }};
     vec4 black = {{ 0, 0, 0, 1 }};
     for (i = 7; i < 40; ++i) {
         font = texture_font_new_from_file(atlas, i, filename);
@@ -136,7 +136,6 @@ void reshape(GLFWwindow* window, int width, int height)
 {
   glViewport(0, 0, width, height);
 
-  LOG(INFO) << width << " " << height;
   ortho = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
 }
 

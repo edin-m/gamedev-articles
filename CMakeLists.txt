@@ -101,13 +101,14 @@ if (USE_GLFW)
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
   add_subdirectory(${EXT_LIB_DIR}/glfw)
   set(EXT_LIBS ${EXT_LIBS} glfw)
-  set(GLFW3_INCLUDE_DIR ${EXT_LIB_DIR}/glfw/include)
-  set(GLFW3_LIBRARY glew3)
-  file(COPY
-    ${CMAKE_BINARY_DIR}/lib/glfw/CMakeFiles/Export/lib/cmake/glfw3/glfw3Targets.cmake
-    DESTINATION
-    ${CMAKE_BINARY_DIR}/lib/glfw/src)
-  set(glfw3_DIR ${CMAKE_BINARY_DIR}/lib/glfw/src)
+  # Uncomment this to provide other libraries with GLFW
+#  set(GLFW3_INCLUDE_DIR ${EXT_LIB_DIR}/glfw/include)
+#  set(GLFW3_LIBRARY glew3)
+#  file(COPY
+#    ${CMAKE_BINARY_DIR}/lib/glfw/CMakeFiles/Export/lib/cmake/glfw3/glfw3Targets.cmake
+#    DESTINATION
+#    ${CMAKE_BINARY_DIR}/lib/glfw/src)
+#  set(glfw3_DIR ${CMAKE_BINARY_DIR}/lib/glfw/src)
 
 endif (USE_GLFW)
 
