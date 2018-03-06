@@ -4,6 +4,16 @@ Playground for bunch of OpenGL-related libraries.
 
 Individual projects are within `projects/`.
 
+# Dependencies
+
+Initialize dependencies with:
+
+`git submodule update --init --recursive`
+
+and
+
+`$ sh init_submodules.sh` - if you're on windows use MSYS `sh`
+
 # Building
 
 ```sh

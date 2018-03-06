@@ -27,6 +27,10 @@ if (BUILD_PHYSFS_102)
   add_subdirectory(physfs-102)
 endif()
 
+if (BUILD_PHYSFS_103)
+  add_subdirectory(physfs-103)
+endif()
+
 if (BUILD_ALURE_101)
   add_subdirectory(alure-101)
 endif()
