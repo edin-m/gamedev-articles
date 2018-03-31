@@ -38,4 +38,3 @@ endif()
 if (BUILD_EIGEN_101)
   add_subdirectory(eigen-101)
 endif()
-

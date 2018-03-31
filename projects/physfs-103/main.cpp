@@ -1,4 +1,6 @@
 #include <vector>
+#include <thread>
+#include <atomic>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -33,15 +35,32 @@ INITIALIZE_EASYLOGGINGPP
 
 #include "IL/il.h"
 
+#include "alure_physfs.h"
+
 using namespace std;
 
+std::atomic<bool> STOP_APP(false);
+
+/**
+ * @brief key_callback
+ * @param window
+ * @param key
+ * @param scancode
+ * @param action
+ * @param mods
+ */
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
   if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-    exit(0);
+    STOP_APP = true;
   }
 }
 
+/**
+ * @brief loadTextFileFromPhysFS
+ * @param fileName
+ * @return
+ */
 std::string loadTextFileFromPhysFS(const char* fileName) {
   std::string data;
   PHYSFS_File* fp;
@@ -58,21 +77,59 @@ std::string loadTextFileFromPhysFS(const char* fileName) {
   return data;
 }
 
+/**
+ * @brief alure_playback
+ */
+static const char* SOUND_FILE = "sounds/bird.ogg";
+void alure_playback() {
+  using namespace alure_physfs;
+
+  alure::FileIOFactory::set(alure::MakeUnique<FileFactory>());
+
+  alure::DeviceManager devMgr = alure::DeviceManager::getInstance();
+
+  alure::Device dev = devMgr.openPlayback();
+  std::cout << "Opened \"" << dev.getName() << "\"" << std::endl;
+
+  alure::Context ctx = dev.createContext();
+  alure::Context::MakeCurrent(ctx);
+
+  alure::StringView sound_filename(SOUND_FILE);
+  alure::SharedPtr<alure::Decoder> decoder = ctx.createDecoder(sound_filename);
+  alure::Source source = ctx.createSource();
+  source.play(decoder, 12000, 4);
+  std::cout << "Playing "<<" ("
+            << alure::GetSampleTypeName(decoder->getSampleType()) << ", "
+            << alure::GetChannelConfigName(decoder->getChannelConfig()) << ", "
+            << decoder->getFrequency()<<"hz)" << std::endl;
+
+  double invfreq = 1.0 / decoder->getFrequency();
+  while (!STOP_APP && source.isPlaying()) {
+    std::cout<< "\r "<<PrettyTime{source.getSecOffset()}<<" / "<<
+                PrettyTime{alure::Seconds(decoder->getLength()*invfreq)};
+    std::cout.flush();
+    std::this_thread::sleep_for(std::chrono::milliseconds(25));
+    ctx.update();
+  }
+  std::cout << std::endl;
+
+  source.destroy();
+  decoder.reset();
+
+  alure::Context::MakeCurrent(nullptr);
+  ctx.destroy();
+  dev.close();
+}
+
+/**
+ * @brief main
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char** argv) {
   argh::parser cmdl;
   cmdl.parse(argc, argv, argh::parser::PREFER_PARAM_FOR_UNREG_OPTION);
-
-  bool use_indices = true;
-
-  if (cmdl["--use-indices"]) {
-    use_indices = true;
-  }
-
-  if (cmdl["--no-use-indices"]) {
-    use_indices = false;
-  }
-
-  LOG(INFO) << "Using indices: " << use_indices;
 
   GLFWwindow* window = nullptr;
 
@@ -185,49 +242,32 @@ int main(int argc, char** argv) {
   // get pointer to the struct
   VertexData* vertexData = (VertexData*) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY_ARB);
 
-  if (!use_indices) {
-    // populate buffer - for (drawArrays) use
-    for (int i = 0; i < mesh->mNumFaces; i++) {
-      aiFace& face = mesh->mFaces[i];
-      for (int k = 0; k < 3; k++) {
-        aiVector3D pos = mesh->mVertices[face.mIndices[k]];
-        aiVector3D uv3 = mesh->mTextureCoords[0][face.mIndices[k]];
-        aiVector2D uv = aiVector2D(uv3.x, uv3.y);
-        aiVector3D normal = mesh->mNormals[face.mIndices[k]];
-        int idx = i * 3 + k;
-        vertexData[idx].vec = pos;
-        vertexData[idx].uv = uv;
-        vertexData[idx].normal = normal;
-      }
-    }
-  } else {
-    // populate - for indices (drawElements) use
-    for (int i = 0; i < mesh->mNumVertices; i++) {
-      aiVector3D pos = mesh->mVertices[i];
-      aiVector3D uv3 = mesh->mTextureCoords[0][i];
-      aiVector2D uv = aiVector2D(uv3.x, uv3.y);
-      aiVector3D normal = mesh->mNormals[i];
-      vertexData[i].vec = pos;
-      vertexData[i].uv = uv;
-      vertexData[i].normal = normal;
-    }
+  // populate - for indices (drawElements) use
+  for (int i = 0; i < mesh->mNumVertices; i++) {
+    aiVector3D pos = mesh->mVertices[i];
+    aiVector3D uv3 = mesh->mTextureCoords[0][i];
+    aiVector2D uv = aiVector2D(uv3.x, uv3.y);
+    aiVector3D normal = mesh->mNormals[i];
+    vertexData[i].vec = pos;
+    vertexData[i].uv = uv;
+    vertexData[i].normal = normal;
   }
   glUnmapBufferARB(GL_ARRAY_BUFFER);
 
-  if (use_indices) {
-    // fill element array
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh->mNumFaces * 3, nullptr, GL_STATIC_DRAW);
-    GLuint* indices = (GLuint*) glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-    for (GLuint i = 0; i < mesh->mNumFaces; i++) {
-      for (GLuint j = 0; j < 3; j++) {
-        *indices++ = mesh->mFaces[i].mIndices[j];
-      }
+  // fill element array
+  glGenBuffers(1, &ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh->mNumFaces * 3, nullptr, GL_STATIC_DRAW);
+  GLuint* indices = (GLuint*) glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+  for (GLuint i = 0; i < mesh->mNumFaces; i++) {
+    for (GLuint j = 0; j < 3; j++) {
+      *indices++ = mesh->mFaces[i].mIndices[j];
     }
-    glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   }
+  glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+  importer.FreeScene();
 
   shader.use();
 
@@ -262,7 +302,11 @@ int main(int argc, char** argv) {
 
   glm::mat4 cammat = camera.matrix();
 
-  while (!glfwWindowShouldClose(window)) {
+  // start audio playback in another thread
+  std::thread thread1(alure_playback);
+
+  // show the UI
+  while (!STOP_APP && !glfwWindowShouldClose(window)) {
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClearDepth(1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -280,12 +324,9 @@ int main(int argc, char** argv) {
     glUniformMatrix4fv(shader.uniform("mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
     // we must bind this
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    if (use_indices) {
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-      glDrawElements(GL_TRIANGLES, totalNumVertices, GL_UNSIGNED_INT, (void*)0);
-    } else {
-      glDrawArrays(GL_TRIANGLES, 0, totalNumVertices);
-    }
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glDrawElements(GL_TRIANGLES, totalNumVertices, GL_UNSIGNED_INT, (void*)0);
+
     glBindVertexArray(0);
     shader.unuse();
 
@@ -296,11 +337,11 @@ int main(int argc, char** argv) {
     glfwPollEvents();
   }
 
+  thread1.join();
+
+  glfwDestroyWindow(window);
+  glfwTerminate();
   textureLoader.cleanup(tex);
-
-  delete physfs_iosystem;
-
   PHYSFS_deinit();
-
   return 0;
 }

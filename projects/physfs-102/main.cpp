@@ -297,10 +297,6 @@ int main(int argc, char** argv) {
   }
 
   textureLoader.cleanup(tex);
-
-  delete physfs_iosystem;
-
   PHYSFS_deinit();
-
   return 0;
 }
