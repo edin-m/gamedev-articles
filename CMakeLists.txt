@@ -313,6 +313,13 @@ if (USE_PHYSFS)
   set(EXT_LIBS ${EXT_LIBS} physfs-static)
 endif()
 
+# OpenAL
+if (WIN32)
+  # set the location of openal lib
+  set(OPENAL_LIBRARY "C:\\Program Files (x86)\\OpenAL 1.1 SDK\\libs\\Win32\\OpenAL32.lib")
+  set(OPENAL_INCLUDE_DIR "C:\\Program Files (x86)\\OpenAL 1.1 SDK\\include")
+endif()
+
 # alure OpenAL
 if (USE_AUDIO_ALURE)
   set(OGG_ROOT ${EXT_LIB_DIR}/ogg)
