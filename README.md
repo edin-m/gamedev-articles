@@ -36,11 +36,19 @@ Compiled output will be placed into `<git-root>/bin` folder.
 
 # Windows requirements
 
-* MSYS in PATH - sed, unzip, sh is required in path
+* Git for windows in PATH with the rest of the tools - sed, unzip, sh is required in path
 * wget - you can get it [here](http://gnuwin32.sourceforge.net/packages/wget.htm) - exe and dependencies need to be in the same folder which needs to be in PATH
 * cmake
 * Supported VS 2015
 * Go to VS command line and then use build commands to build projects
+
+git prompt:
+
+`$ git submodule update --init --recursive -- lib`
+
+Developer Command Prompt for VS2015:
+
+`> cmake -DBUILD_ASSIMP_101=ON ..`
 
 # Libraries
 
