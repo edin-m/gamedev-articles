@@ -1,64 +1,71 @@
+[submodule "lib/DevIL"]
+    path = lib/DevIL
+    url = https://github.com/DentonW/DevIL.git
+    branch = e34284a7e07763769f671a74b4fec718174ad862
+[submodule "lib/alure"]
+    path = lib/alure
+    url = https://github.com/edin-m/alure.git
+    branch = 3a229dfb5429220b2773015a79aae0361e62be48
+[submodule "lib/argh"]
+    path = lib/argh
+    url = https://github.com/adishavit/argh.git
+    branch = eac6629dca5a368048b4d2eeec30f760efd867a1
+[submodule "lib/assimp"]
+    path = lib/assimp
+    url = https://github.com/assimp/assimp.git
+    branch = 80799bdbf90ce626475635815ee18537718a05b1
+[submodule "lib/easyloggingpp"]
+    path = lib/easyloggingpp
+    url = https://github.com/muflihun/easyloggingpp.git
+    branch = 66a3a8741c42a512bd9237dff458bb6b055215e7
+[submodule "lib/eigen"]
+    path = lib/eigen
+    url = https://github.com/eigenteam/eigen-git-mirror.git
+    branch = dde02fceedfc1ba09d4d4f71a2b5dafcfcb85491
+[submodule "lib/freeglut"]
+    path = lib/freeglut
+    url = https://github.com/dcnieho/FreeGLUT.git
+    branch = 44cf4b5b85cf6037349c1c8740b2531d7278207d
+[submodule "lib/freetype-gl"]
+    path = lib/freetype-gl
+    url = https://github.com/rougier/freetype-gl.git
+    branch = 507cc68511465981d32257268fee184b79cc69f7
 [submodule "lib/glew"]
 	path = lib/glew
-    url = https://github.com/nigels-com/glew.git
+	url = https://github.com/nigels-com/glew.git
     branch = 3a8eff77da3658c13fbd3634c943d5251d76322c
-[submodule "lib/glm"]
-	path = lib/glm
-	url = https://github.com/g-truc/glm.git
-    branch = 6fa203eeb7fbcbb6f620501fad40359c8a456049
-[submodule "lib/glfw"]
-	path = lib/glfw
-	url = https://github.com/glfw/glfw.git
-    branch = 999f3556fdd80983b10051746264489f2cb1ef16
-[submodule "lib/DevIL"]
-	path = lib/DevIL
-	url = https://github.com/DentonW/DevIL.git
-    branch = e34284a7e07763769f671a74b4fec718174ad862
-[submodule "lib/soil"]
-	path = lib/soil
-	url = https://github.com/kbranigan/Simple-OpenGL-Image-Library
-    branch = 4fff135429c4c7996791c019e6cc20a1e9fde568
-[submodule "lib/openexr"]
-	path = lib/openexr
-	url = https://github.com/openexr/openexr.git
 [submodule "lib/glfm"]
-	path = lib/glfm
-	url = https://github.com/brackeen/glfm.git
+    path = lib/glfm
+    url = https://github.com/brackeen/glfm.git
     branch = 8b6973dbc83acdcad58a168e44871de414773d9d
-[submodule "lib/easyloggingpp"]
-	path = lib/easyloggingpp
-	url = https://github.com/muflihun/easyloggingpp.git
-[submodule "lib/freeglut"]
-	path = lib/freeglut
-	url = https://github.com/dcnieho/FreeGLUT.git
-[submodule "lib/freetype-gl"]
-	path = lib/freetype-gl
-	url = https://github.com/rougier/freetype-gl.git
-[submodule "lib/assimp"]
-	path = lib/assimp
-	url = https://github.com/assimp/assimp.git
-    branch = 80799bdbf90ce626475635815ee18537718a05b1
-[submodule "lib/argh"]
-	path = lib/argh
-	url = https://github.com/adishavit/argh.git
-    branch = 5768268e2f072e3d13022cbacd89f47e33efa0dc
-[submodule "lib/zlib"]
-	path = lib/zlib
-	url = https://github.com/madler/zlib.git
-    branch = cacf7f1d4e3d44d871b605da3b647f07d718623f
-[submodule "lib/alure"]
-	path = lib/alure
-	url = https://github.com/edin-m/alure.git
-    branch = e7c3fb1c53b0f94e9e229ed94f4bf3e6a29ce7a0
-[submodule "lib/vorbis"]
-	path = lib/vorbis
-	url = https://github.com/xiph/vorbis
-    branch = f4093202cb226b360d0edf8a948aa71142cec657
+[submodule "lib/glfw"]
+    path = lib/glfw
+    url = https://github.com/glfw/glfw.git
+    branch = 999f3556fdd80983b10051746264489f2cb1ef16
+[submodule "lib/glm"]
+    path = lib/glm
+    url = https://github.com/g-truc/glm.git
+    branch = fe7c7b5ac15ba8d5c9c45984831dc2e830726b33
 [submodule "lib/ogg"]
-	path = lib/ogg
-	url = https://github.com/xiph/ogg
+    path = lib/ogg
+    url = https://github.com/xiph/ogg
     branch = 4380566a44b8d5e85ad511c9c17eb04197863ec5
-[submodule "lib/eigen"]
-	path = lib/eigen
-	url = https://github.com/eigenteam/eigen-git-mirror.git
-    branch = dde02fceedfc1ba09d4d4f71a2b5dafcfcb85491
+[submodule "lib/openexr"]
+    path = lib/openexr
+    url = https://github.com/openexr/openexr.git
+    branch = dcaf5fdb4d1244d8e60a58832cfe9c54734a2257
+[submodule "lib/soil"]
+    path = lib/soil
+    url = https://github.com/kbranigan/Simple-OpenGL-Image-Library
+    branch = 4fff135429c4c7996791c019e6cc20a1e9fde568
+[submodule "lib/vorbis"]
+    path = lib/vorbis
+    url = https://github.com/xiph/vorbis
+    branch = d22c3ab5f633460abc2532feee60ca0892134cbf
+[submodule "lib/zlib"]
+    path = lib/zlib
+    url = https://github.com/madler/zlib.git
+    branch = cacf7f1d4e3d44d871b605da3b647f07d718623f
+
+
+
