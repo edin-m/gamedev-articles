@@ -20,6 +20,7 @@ and
 $ mkdir build
 $ cd build
 $ cmake .. [-DBUILD_ASSIMP_101]
+$ make -j4
 ```
 
 to build `assimp_101` project or `BUILD_ALL_DESKTOP_PROJECTS` to build all projects.
